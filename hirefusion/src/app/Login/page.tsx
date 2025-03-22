@@ -196,11 +196,3 @@ export default function LoginForm() {
     </div>
   )
 }
-
-=======
-export default function Login() {
-    return (
-      <h1 className="text=2xl text-center">Welcome to HireFusion Login</h1>
-    );
-  }
->>>>>>> 7ecdbfd90d4019c1efebc830e48765020156d538
