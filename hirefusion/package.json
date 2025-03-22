@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@types/bcryptjs": "^2.4.6",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -20,6 +21,11 @@
     "react-email": "^3.0.7",
     "resend": "^4.1.2",
     "zod": "^3.24.2"
+=======
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "15.2.3"
+>>>>>>> f5ba8e76121928f1b6cb5206800c163c82f47792
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
