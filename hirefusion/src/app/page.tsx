@@ -4,7 +4,7 @@ export default function Home() {
     <>
     
     <h1 className="text=2xl text-center">Welcome to HireFusion</h1>
-    <Link href="/SignUp">Signup </Link>
+    <Link href="/signup">Signup </Link>
     <Link href="/signin">Login </Link>
     </>
   );
