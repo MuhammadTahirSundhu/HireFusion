@@ -1,4 +1,3 @@
-
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
@@ -17,12 +16,8 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials: any): Promise<any> {
         await dbConnect();
         try {
-          const user = await UserModel.findOne({
-            $or: [
-              { email: credentials.identifier },
-              { username: credentials.identifier },
-            ],
-          });
+          const user = await UserModel.findOne({ email: credentials.email });
+
           if (!user) {
             throw new Error('No user found with this email');
           }
@@ -33,13 +28,19 @@ export const authOptions: NextAuthOptions = {
             credentials.password,
             user.password
           );
-          if (isPasswordCorrect) {
-            return user;
-          } else {
+          if (!isPasswordCorrect) {
             throw new Error('Incorrect password');
           }
+
+          return {
+            id: user._id.toString(),
+            name: user.username,
+            email: user.email,
+            isVerified: user.isVerified,
+            isAcceptingMessages: user.isAcceptingMessages,
+          };
         } catch (err: any) {
-          throw new Error(err);
+          throw new Error(err.message || 'Authentication failed');
         }
       },
     }),
@@ -47,20 +48,20 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = user._id?.toString(); // Convert ObjectId to string
+        token._id = user.id;
         token.isVerified = user.isVerified;
         token.isAcceptingMessages = user.isAcceptingMessages;
-        token.username = user.username;
+        token.username = user.name;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user._id = token._id;
-        session.user.isVerified = token.isVerified;
-        session.user.isAcceptingMessages = token.isAcceptingMessages;
-        session.user.username = token.username;
-      }
+      session.user = { 
+        _id: token._id, 
+        isVerified: token.isVerified, 
+        isAcceptingMessages: token.isAcceptingMessages, 
+        username: token.username 
+      };
       return session;
     },
   },

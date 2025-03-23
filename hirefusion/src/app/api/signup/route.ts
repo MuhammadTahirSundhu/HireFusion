@@ -27,6 +27,10 @@ export async function POST(request: Request) {
             existingUserByEmail.verifyCodeExpire = new Date(Date.now() + 3600000);
             await existingUserByEmail.save();
         } else {
+            const emailResponse = await sendVerificationEmail(email, username, verifyCode);
+            if (!emailResponse.success) {
+                return Response.json({ success: false, message: emailResponse.message }, { status: 500 });
+            }
             const newUser = new UserModel({
                 username,
                 email,
@@ -38,11 +42,6 @@ export async function POST(request: Request) {
             await newUser.save();
         }
 
-        // Send verification email
-        const emailResponse = await sendVerificationEmail(email, username, verifyCode);
-        if (!emailResponse.success) {
-            return Response.json({ success: false, message: emailResponse.message }, { status: 500 });
-        }
 
         return Response.json({ success: true, message: "User registered successfully. Please verify your email." }, { status: 201 });
 
