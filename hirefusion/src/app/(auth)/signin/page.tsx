@@ -13,7 +13,7 @@ export default function SignIn() {
                     onClick={() => signIn("credentials", { email: "jsmith@gmail.com", password: "password123" })}
                     className="w-full py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all font-medium text-lg shadow-md"
                 >
-                    Sign In with Credentials
+                    Sign In with Credentials  
                 </button>
 
                 <p className="mt-4 text-gray-600 text-center text-sm">
