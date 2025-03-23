@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { AlertCircle, CheckCircle2 } from "lucide-react"
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 
 export default function SignupForm() {
   // Form values
@@ -25,6 +24,13 @@ export default function SignupForm() {
   // Form submission state
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [apiError, setApiError] = useState("")
+
+  // OTP state
+  const [otp, setOtp] = useState("")
+  const [isOtpVerified, setIsOtpVerified] = useState(false)
+  const [isOtpSubmitting, setIsOtpSubmitting] = useState(false)
+  const [otpError, setOtpError] = useState("")
 
   // Validation patterns
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -68,7 +74,7 @@ export default function SignupForm() {
   }
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // Mark all fields as touched
@@ -81,49 +87,109 @@ export default function SignupForm() {
 
     if (isFormValid) {
       setIsSubmitting(true)
+      setApiError("")
 
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false)
+      try {
+        const response = await fetch("/api/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: formValues.name,
+            email: formValues.email,
+            password: formValues.password,
+          }),
+        })
+
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result.message || "Something went wrong!")
+        }
+
         setIsSubmitted(true)
+      } catch (error: any) {
+        setApiError(error.message)
+      } finally {
+        setIsSubmitting(false)
+      }
+    }
+  }
 
-        // Reset form after submission
-        setFormValues({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        })
+  // Handle OTP submission
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-        setTouched({
-          name: false,
-          email: false,
-          password: false,
-          confirmPassword: false,
-        })
-      }, 1500)
+    setIsOtpSubmitting(true)
+    setOtpError("")
+
+    try {
+      const response = await fetch("/api/verifycode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formValues.name,
+          code: otp,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || "Invalid OTP")
+      }
+
+      setIsOtpVerified(true)
+      window.location.href = "/home"
+    } catch (error: any) {
+      setOtpError(error.message)
+    } finally {
+      setIsOtpSubmitting(false)
     }
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-xl overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-800">Create an account</h2>
           <p className="text-gray-600 mt-1">Enter your information to get started</p>
         </div>
         <div className="p-6">
           {isSubmitted ? (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4 flex items-start">
-              <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
-              <p className="ml-3 text-green-700">Your account has been created successfully!</p>
+            <div className="space-y-5">
+              <div className="bg-green-50 border border-green-200 rounded-md p-4 flex items-start">
+                <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                <p className="ml-3 text-green-700">Your account has been created successfully! Please check your email for the OTP.</p>
+              </div>
+              <form onSubmit={handleOtpSubmit} className="space-y-5">
+                {otpError && <p className="text-red-500 text-sm text-center">{otpError}</p>}
+                <input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  disabled={isOtpSubmitting}
+                >
+                  {isOtpSubmitting ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : "Verify OTP"}
+                </button>
+              </form>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {apiError && <p className="text-red-500 text-sm text-center">{apiError}</p>}
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                 <input
                   id="name"
                   name="name"
@@ -131,23 +197,12 @@ export default function SignupForm() {
                   value={formValues.name}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
-                    errors.name
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-gray-300 focus:ring-blue-200 focus:border-blue-400"
-                  }`}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.name}
-                  </p>
-                )}
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
-
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email <span className="text-red-500">*</span>
-                </label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
                 <input
                   id="email"
                   name="email"
@@ -156,23 +211,12 @@ export default function SignupForm() {
                   value={formValues.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
-                    errors.email
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-gray-300 focus:ring-blue-200 focus:border-blue-400"
-                  }`}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.email}
-                  </p>
-                )}
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
-
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password <span className="text-red-500">*</span>
-                </label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
                 <input
                   id="password"
                   name="password"
@@ -180,23 +224,12 @@ export default function SignupForm() {
                   value={formValues.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
-                    errors.password
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-gray-300 focus:ring-blue-200 focus:border-blue-400"
-                  }`}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.password}
-                  </p>
-                )}
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
-
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password <span className="text-red-500">*</span>
-                </label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -204,41 +237,21 @@ export default function SignupForm() {
                   value={formValues.confirmPassword}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
-                    errors.confirmPassword
-                      ? "border-red-500 focus:ring-red-200"
-                      : "border-gray-300 focus:ring-blue-200 focus:border-blue-400"
-                  }`}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> {errors.confirmPassword}
-                  </p>
-                )}
+                {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
               </div>
-
               <button
                 type="submit"
-                className={`w-full py-2 px-4 mt-6 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
-                }`}
+                className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Creating Account..." : "Sign Up"}
+                {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : "Sign Up"}
               </button>
             </form>
           )}
-        </div>
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <a href="#" className="text-blue-600 font-medium hover:underline">
-              Sign in
-            </a>
-          </p>
         </div>
       </div>
     </div>
   )
 }
-
