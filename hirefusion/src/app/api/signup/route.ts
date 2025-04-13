@@ -22,7 +22,7 @@ export async function POST(request: Request) {
             if (existingUserByEmail.isVerified) {
                 return Response.json({ success: false, message: "User already exists with this email" }, { status: 400 });
             }
-            existingUserByEmail.password = password;  // Do not hash again
+            existingUserByEmail.password = password;
             existingUserByEmail.verifyCode = verifyCode;
             existingUserByEmail.verifyCodeExpire = new Date(Date.now() + 3600000);
             await existingUserByEmail.save();

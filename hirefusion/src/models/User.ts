@@ -35,19 +35,6 @@ const UserSchema: Schema<User> = new Schema(
   { timestamps: true }
 );
 
-// Middleware to hash the password before saving
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  try {
-    const saltRounds = 10;
-    this.password = await bcrypt.hash(this.password, saltRounds);
-    next();
-  } catch (error: any) {
-    next(error);
-  }
-});
-
 const UserModel =
   (mongoose.models.User as mongoose.Model<User>) ||
   mongoose.model<User>("User", UserSchema);
