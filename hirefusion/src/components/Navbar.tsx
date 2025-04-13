@@ -19,7 +19,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/", label: "Dashboard", icon: <FaTachometerAlt /> },
     { href: "/address-book", label: "Address Book", icon: <FaAddressBook /> },
-    { href: "/components", label: "Components", icon: <FaClone /> },
+    { href: "/home/jobs", label: "Jobs", icon: <FaClone /> },
     { href: "/calendar", label: "Calendar", icon: <FaCalendarAlt /> },
     { href: "/charts", label: "Charts", icon: <FaChartBar /> },
     { href: "/documents", label: "Documents", icon: <FaCopy /> },
