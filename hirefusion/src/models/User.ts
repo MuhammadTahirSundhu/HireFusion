@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export interface User extends Document {
   username: string;
@@ -13,7 +13,6 @@ export interface User extends Document {
 const UserSchema: Schema<User> = new Schema(
   {
     username: { type: String, required: true, unique: true, trim: true },
-
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -25,12 +24,10 @@ const UserSchema: Schema<User> = new Schema(
         "Please enter a valid email address",
       ],
     },
-
     password: {
       type: String,
       required: true,
     },
-
     verifyCode: { type: String, required: true },
     verifyCodeExpire: { type: Date, required: true },
     isVerified: { type: Boolean, default: false },
@@ -46,7 +43,7 @@ UserSchema.pre("save", async function (next) {
     const saltRounds = 10;
     this.password = await bcrypt.hash(this.password, saltRounds);
     next();
-  } catch (error:any) {
+  } catch (error: any) {
     next(error);
   }
 });

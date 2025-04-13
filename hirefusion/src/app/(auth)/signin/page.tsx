@@ -4,36 +4,49 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { toast, ToastContainer } from "react-toastify"; // Import toast and ToastContainer
+import "react-toastify/dist/ReactToastify.css"; // Import CSS for Toastify
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
 
         if (!email || !password) {
-            setError("Please fill in all fields.");
+            toast.error("Please fill in all fields."); // Show error using toast
             setLoading(false);
             return;
         }
 
-        const res = await signIn("credentials", {
-            email,
-            password,
-            redirect: false,
-        });
+        try {
+            // Handle sign in with credentials
+            const res = await signIn("credentials", {
+                email,
+                password,
+                redirect: false, // Prevent NextAuth from redirecting automatically
+            });
 
-        if (res?.error) {
-            setError("Invalid email or password.");
+            if (res?.error) {
+                // If there's an error from NextAuth
+                toast.error("Invalid email or password."); // Show error using toast
+                setLoading(false);
+            } else if (res?.ok) {
+                // Redirect after successful login
+                const destination = router.query?.redirect || "/home"; // Handle redirect if set
+                router.push(destination); // Trigger the redirect to the destination
+            } else {
+                // In case of unexpected response
+                throw new Error("Unexpected error occurred");
+            }
+        } catch (error) {
+            // Handle unexpected errors
+            toast.error(error instanceof Error ? error.message : "An unexpected error occurred.");
             setLoading(false);
-        } else {
-            router.push("/dashboard");
         }
     };
 
@@ -41,8 +54,6 @@ export default function SignIn() {
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
             <div className="w-full max-w-md p-8 bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/20">
                 <h1 className="text-3xl font-extrabold text-white text-center mb-6">Welcome Back</h1>
-
-                {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Email Input */}
@@ -91,14 +102,6 @@ export default function SignIn() {
                     <div className="flex-grow border-t border-white/20"></div>
                 </div>
 
-                {/* Quick Sign-In Button */}
-                <button
-                    onClick={() => signIn("credentials", { email: "jsmith@gmail.com", password: "password123" })}
-                    className="w-full py-3 text-white bg-gray-700 hover:bg-gray-800 transition-all font-medium text-lg rounded-lg shadow-md"
-                >
-                    Sign In with Credentials  
-                </button>
-
                 {/* Signup Redirect */}
                 <p className="mt-4 text-white text-center text-sm">
                     Don't have an account?{" "}
@@ -107,6 +110,19 @@ export default function SignIn() {
                     </a>
                 </p>
             </div>
+
+            {/* Toast Container to render error messages */}
+            <ToastContainer 
+                position="top-right" 
+                autoClose={5000} 
+                hideProgressBar={false} 
+                newestOnTop={false} 
+                closeOnClick 
+                rtl={false} 
+                pauseOnFocusLoss 
+                draggable 
+                pauseOnHover 
+            />
         </div>
     );
 }
