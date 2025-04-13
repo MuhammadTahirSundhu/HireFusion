@@ -143,7 +143,7 @@ export default function SignupForm() {
       }
 
       setIsOtpVerified(true)
-      window.location.href = "/home"
+      window.location.href = "/signin"
     } catch (error: any) {
       setOtpError(error.message)
     } finally {
