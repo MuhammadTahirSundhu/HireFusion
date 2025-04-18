@@ -7,7 +7,7 @@ import { JobCardSkeleton, JobDetailsSkeleton } from "@/components/skeleton-loade
 import { MobileFilters, DesktopFilters } from "@/components/job-filters"
 import { Pagination } from "@/components/pagination"
 import { JobAlerts } from "@/components/job-alerts"
-import { AdvancedFilters, type FilterOptions } from "@/components/advanced-filters"
+// import { AdvancedFilters, type FilterOptions } from "@/components/advanced-filters"
 
 const jobOptions = [
   "Frontend Developer",
@@ -37,26 +37,26 @@ export default function JobsPage() {
   const [activeTab, setActiveTab] = useState("search")
 
   // Advanced filters state
-  const [advancedFilterOptions, setAdvancedFilterOptions] = useState<FilterOptions>({
-    jobTypes: [],
-    experienceLevels: [],
-    salaryRange: [0, 250000],
-    skills: [],
-    companies: [],
-    industries: [],
-    datePosted: null,
-    remoteOptions: [],
-  })
-  const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterOptions>({
-    jobTypes: [],
-    experienceLevels: [],
-    salaryRange: [0, 250000],
-    skills: [],
-    companies: [],
-    industries: [],
-    datePosted: null,
-    remoteOptions: [],
-  })
+  // const [advancedFilterOptions, setAdvancedFilterOptions] = useState<FilterOptions>({
+  //   jobTypes: [],
+  //   experienceLevels: [],
+  //   salaryRange: [0, 250000],
+  //   skills: [],
+  //   companies: [],
+  //   industries: [],
+  //   datePosted: null,
+  //   remoteOptions: [],
+  // })
+  // const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterOptions>({
+  //   jobTypes: [],
+  //   experienceLevels: [],
+  //   salaryRange: [0, 250000],
+  //   skills: [],
+  //   companies: [],
+  //   industries: [],
+  //   datePosted: null,
+  //   remoteOptions: [],
+  // })
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -122,46 +122,46 @@ export default function JobsPage() {
     return `${baseId}-${index}-${uniqueSuffix}`
   }
 
-  const applyAdvancedFilters = () => {
-    setAppliedFilterOptions(advancedFilterOptions)
-    fetchJobs()
-  }
+  // const applyAdvancedFilters = () => {
+  //   setAppliedFilterOptions(advancedFilterOptions)
+  //   fetchJobs()
+  // }
 
-  const resetAdvancedFilters = () => {
-    setAdvancedFilterOptions({
-      jobTypes: [],
-      experienceLevels: [],
-      salaryRange: [0, 250000],
-      skills: [],
-      companies: [],
-      industries: [],
-      datePosted: null,
-      remoteOptions: [],
-    })
-    setAppliedFilterOptions({
-      jobTypes: [],
-      experienceLevels: [],
-      salaryRange: [0, 250000],
-      skills: [],
-      companies: [],
-      industries: [],
-      datePosted: null,
-      remoteOptions: [],
-    })
-  }
+  // const resetAdvancedFilters = () => {
+  //   setAdvancedFilterOptions({
+  //     jobTypes: [],
+  //     experienceLevels: [],
+  //     salaryRange: [0, 250000],
+  //     skills: [],
+  //     companies: [],
+  //     industries: [],
+  //     datePosted: null,
+  //     remoteOptions: [],
+  //   })
+  //   setAppliedFilterOptions({
+  //     jobTypes: [],
+  //     experienceLevels: [],
+  //     salaryRange: [0, 250000],
+  //     skills: [],
+  //     companies: [],
+  //     industries: [],
+  //     datePosted: null,
+  //     remoteOptions: [],
+  //   })
+  // }
 
-  const getActiveFilterCount = () => {
-    return (
-      advancedFilterOptions.jobTypes.length +
-      advancedFilterOptions.experienceLevels.length +
-      advancedFilterOptions.skills.length +
-      advancedFilterOptions.companies.length +
-      advancedFilterOptions.industries.length +
-      advancedFilterOptions.remoteOptions.length +
-      (advancedFilterOptions.datePosted ? 1 : 0) +
-      (advancedFilterOptions.salaryRange[0] > 0 || advancedFilterOptions.salaryRange[1] < 250000 ? 1 : 0)
-    )
-  }
+  // const getActiveFilterCount = () => {
+  //   return (
+  //     advancedFilterOptions.jobTypes.length +
+  //     advancedFilterOptions.experienceLevels.length +
+  //     advancedFilterOptions.skills.length +
+  //     advancedFilterOptions.companies.length +
+  //     advancedFilterOptions.industries.length +
+  //     advancedFilterOptions.remoteOptions.length +
+  //     (advancedFilterOptions.datePosted ? 1 : 0) +
+  //     (advancedFilterOptions.salaryRange[0] > 0 || advancedFilterOptions.salaryRange[1] < 250000 ? 1 : 0)
+  //   )
+  // }
 
   const fetchJobs = async () => {
     setLoading(true)
@@ -207,37 +207,38 @@ export default function JobsPage() {
       }, [])
 
       // Apply advanced filters
-      const filteredJobs = uniqueJobs.filter((job) => {
-        // Filter by job type
-        if (appliedFilterOptions.jobTypes.length > 0 && job["job-type"]) {
-          if (
-            !appliedFilterOptions.jobTypes.some((type) => job["job-type"]?.toLowerCase().includes(type.toLowerCase()))
-          ) {
-            return false
-          }
-        }
+      const filteredJobs = uniqueJobs
+      // const filteredJobs = uniqueJobs.filter((job) => {
+      //   // Filter by job type
+      //   if (appliedFilterOptions.jobTypes.length > 0 && job["job-type"]) {
+      //     if (
+      //       !appliedFilterOptions.jobTypes.some((type) => job["job-type"]?.toLowerCase().includes(type.toLowerCase()))
+      //     ) {
+      //       return false
+      //     }
+      //   }
 
-        // For demo purposes, we'll randomly assign other properties to jobs
-        // In a real app, these would come from the API
-        const randomSalary = 40000 + Math.floor(Math.random() * 160000)
-        const randomExperience = experienceLevelOptions[Math.floor(Math.random() * experienceLevelOptions.length)]
+      //   // For demo purposes, we'll randomly assign other properties to jobs
+      //   // In a real app, these would come from the API
+      //   const randomSalary = 40000 + Math.floor(Math.random() * 160000)
+      //   const randomExperience = experienceLevelOptions[Math.floor(Math.random() * experienceLevelOptions.length)]
 
-        // Filter by salary
-        if (randomSalary < appliedFilterOptions.salaryRange[0] || randomSalary > appliedFilterOptions.salaryRange[1]) {
-          return false
-        }
+      //   // Filter by salary
+      //   if (randomSalary < appliedFilterOptions.salaryRange[0] || randomSalary > appliedFilterOptions.salaryRange[1]) {
+      //     return false
+      //   }
 
-        // Filter by experience level
-        if (appliedFilterOptions.experienceLevels.length > 0) {
-          if (!appliedFilterOptions.experienceLevels.includes(randomExperience)) {
-            return false
-          }
-        }
+      //   // Filter by experience level
+      //   if (appliedFilterOptions.experienceLevels.length > 0) {
+      //     if (!appliedFilterOptions.experienceLevels.includes(randomExperience)) {
+      //       return false
+      //     }
+      //   }
 
-        // For other filters, we would apply similar logic
-        // but for demo purposes, we'll just return true for the rest
-        return true
-      })
+      //   // For other filters, we would apply similar logic
+      //   // but for demo purposes, we'll just return true for the rest
+      //   return true
+      // })
 
       setResults(filteredJobs)
       if (filteredJobs.length > 0) {
@@ -393,13 +394,13 @@ export default function JobsPage() {
             </div>
 
             {/* Advanced Filters */}
-            <AdvancedFilters
+            {/* <AdvancedFilters
               filterOptions={advancedFilterOptions}
               setFilterOptions={setAdvancedFilterOptions}
               applyFilters={applyAdvancedFilters}
               resetFilters={resetAdvancedFilters}
               activeFilterCount={getActiveFilterCount()}
-            />
+            /> */}
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8">
