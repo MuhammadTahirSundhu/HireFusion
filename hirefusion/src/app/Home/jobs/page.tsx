@@ -1,16 +1,17 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Filter, Search, Bookmark, Bell, Sparkles, Sliders } from "lucide-react"
-import { JobCard, type JobWithId, type Job } from "@/components/job-card"
+import { Search, Bookmark, Bell, Sparkles, Sliders } from "lucide-react"
+import { JobCard, JobWithId, Job } from "@/components/job-card"
 import { JobDetails } from "@/components/job-details"
 import { JobCardSkeleton, JobDetailsSkeleton } from "@/components/skeleton-loader"
-import { MobileFilters, DesktopFilters } from "@/components/job-filters"
 import { Pagination } from "@/components/pagination"
 import { JobAlerts } from "@/components/job-alerts"
-import { AdvancedFilters, type FilterOptions } from "@/components/advanced-filters"
+import { AdvancedFilters, FilterOptions } from "@/components/advanced-filters"
 import { RecommendedJobs } from "@/components/recommended-jobs"
 
-const jobOptions = [
+
+
+const jobOptions: string[] = [
   "Frontend Developer",
   "Backend Developer",
   "Full Stack Developer",
@@ -18,11 +19,11 @@ const jobOptions = [
   "DevOps Engineer",
 ]
 
-const locationOptions = ["New York", "California", "Texas", "Remote", "Canada", "United Kingdom"]
+const locationOptions: string[] = ["New York", "California", "Texas", "Remote", "Canada", "United Kingdom"]
 
-const jobTypeOptions = ["Full-time", "Part-time", "Contract", "Temporary", "Internship", "Freelance"]
+const jobTypeOptions: string[] = ["Full-time", "Part-time", "Contract", "Temporary", "Internship", "Freelance"]
 
-const experienceLevelOptions = ["Entry Level", "Mid Level", "Senior Level", "Director", "Executive"]
+const experienceLevelOptions: string[] = ["Entry Level", "Mid Level", "Senior Level", "Director", "Executive"]
 
 export default function JobsPage() {
   const [selectedJobs, setSelectedJobs] = useState<string[]>([])
@@ -31,11 +32,10 @@ export default function JobsPage() {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedJobIndex, setSelectedJobIndex] = useState<number | null>(null)
-  const [filterOpen, setFilterOpen] = useState<boolean>(false)
-  const [scrollPosition, setScrollPosition] = useState(0)
-  const [savedJobs, setSavedJobs] = useState<string[]>([]) // Array of job IDs
+  const [scrollPosition, setScrollPosition] = useState<number>(0)
+  const [savedJobs, setSavedJobs] = useState<string[]>([])
   const [showSavedOnly, setShowSavedOnly] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState("all-jobs")
+  const [activeTab, setActiveTab] = useState<"all-jobs" | "recommended" | "filters" | "alerts">("all-jobs")
 
   // Advanced filters state
   const [advancedFilterOptions, setAdvancedFilterOptions] = useState<FilterOptions>({
@@ -60,14 +60,14 @@ export default function JobsPage() {
   })
 
   // Pagination states
-  const [currentPage, setCurrentPage] = useState(1)
-  const [jobsPerPage] = useState(10)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [jobsPerPage] = useState<number>(10)
 
   // Load saved jobs from localStorage on initial render
   useEffect(() => {
     const savedJobsFromStorage = localStorage.getItem("savedJobs")
     if (savedJobsFromStorage) {
-      setSavedJobs(JSON.parse(savedJobsFromStorage))
+      setSavedJobs(JSON.parse(savedJobsFromStorage) as string[])
     }
   }, [])
 
@@ -85,16 +85,23 @@ export default function JobsPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleJobToggle = (job: string) => {
+  // Fetch jobs when activeTab changes to "all-jobs"
+  useEffect(() => {
+    if (activeTab === "all-jobs") {
+      fetchJobs()
+    }
+  }, [activeTab])
+
+  const handleJobToggle = (job: string): void => {
     setSelectedJobs((prev) => (prev.includes(job) ? prev.filter((j) => j !== job) : [...prev, job]))
   }
 
-  const handleLocationToggle = (location: string) => {
+  const handleLocationToggle = (location: string): void => {
     setSelectedLocations((prev) => (prev.includes(location) ? prev.filter((l) => l !== location) : [...prev, location]))
   }
 
   // Toggle job bookmark status
-  const toggleSaveJob = (jobId: string) => {
+  const toggleSaveJob = (jobId: string): void => {
     setSavedJobs((prev) => {
       if (prev.includes(jobId)) {
         return prev.filter((id) => id !== jobId)
@@ -105,30 +112,24 @@ export default function JobsPage() {
   }
 
   // Toggle showing only saved jobs
-  const toggleShowSavedOnly = () => {
+  const toggleShowSavedOnly = (): void => {
     setShowSavedOnly((prev) => !prev)
     setCurrentPage(1) // Reset to first page when toggling filter
   }
 
-  // Generate a unique ID for a job - FIXED to avoid duplicates
+  // Generate a unique ID for a job
   const generateJobId = (job: Job, index: number): string => {
-    // Create a base ID from job properties
-    const baseId = `${job.title}-${job.company}-${job.location}`.replace(/\s+/g, "-").toLowerCase()
-
-    // Add a random component to ensure uniqueness
-    // Using a combination of timestamp and random number
+    const baseId = `${job.job_title}-${job.company_name}-${job.job_location}`.replace(/\s+/g, "-").toLowerCase()
     const uniqueSuffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 5)
-
-    // Combine with the index to further ensure uniqueness
     return `${baseId}-${index}-${uniqueSuffix}`
   }
 
-  const applyAdvancedFilters = () => {
+  const applyAdvancedFilters = (): void => {
     setAppliedFilterOptions(advancedFilterOptions)
-    fetchJobs()
+    // Placeholder: Fetch or filter jobs with new advanced filters
   }
 
-  const resetAdvancedFilters = () => {
+  const resetAdvancedFilters = (): void => {
     setAdvancedFilterOptions({
       jobTypes: [],
       experienceLevels: [],
@@ -151,84 +152,28 @@ export default function JobsPage() {
     })
   }
 
-  const fetchJobs = async () => {
+  // Fetch jobs from /jobs/all-jobs API
+  const fetchJobs = async (): Promise<void> => {
     setLoading(true)
     setError(null)
     setResults([])
     setSelectedJobIndex(null)
-    setCurrentPage(1) // Reset to first page when fetching new results
-    setShowSavedOnly(false) // Reset saved filter when searching
-    const numPages = 5
+    setCurrentPage(1)
+    setShowSavedOnly(false)
 
     try {
-      const allJobs: JobWithId[] = []
-
-      for (const jobTitle of selectedJobs) {
-        for (const location of selectedLocations) {
-          for (let page = 0; page < numPages; page++) {
-            const start = page * 10
-            const response = await fetch(
-              `/api/jobs?jobTitle=${encodeURIComponent(jobTitle)}&location=${encodeURIComponent(location)}&start=${start}`,
-            )
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
-
-            const data = await response.json()
-            // Add unique IDs to each job
-            const jobsWithIds = data.jobs.map((job: Job, index: number) => ({
-              ...job,
-              id: generateJobId(job, allJobs.length + index),
-            }))
-            allJobs.push(...jobsWithIds)
-          }
-        }
+      const response = await fetch("/api/jobs/all-jobs")
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-
-      // Ensure no duplicate IDs in the results
-      const uniqueJobs = allJobs.reduce((acc: JobWithId[], job: JobWithId) => {
-        if (!acc.some((j) => j.id === job.id)) {
-          acc.push(job)
-        }
-        return acc
-      }, [])
-
-      // Apply advanced filters
-      const filteredJobs = uniqueJobs.filter((job) => {
-        // Filter by job type
-        if (appliedFilterOptions.jobTypes.length > 0 && job["job-type"]) {
-          if (
-            !appliedFilterOptions.jobTypes.some((type) => job["job-type"]?.toLowerCase().includes(type.toLowerCase()))
-          ) {
-            return false
-          }
-        }
-
-        // For demo purposes, we'll randomly assign other properties to jobs
-        // In a real app, these would come from the API
-        const randomSalary = 40000 + Math.floor(Math.random() * 160000)
-        const randomExperience = experienceLevelOptions[Math.floor(Math.random() * experienceLevelOptions.length)]
-
-        // Filter by salary
-        if (randomSalary < appliedFilterOptions.salaryRange[0] || randomSalary > appliedFilterOptions.salaryRange[1]) {
-          return false
-        }
-
-        // Filter by experience level
-        if (appliedFilterOptions.experienceLevels.length > 0) {
-          if (!appliedFilterOptions.experienceLevels.includes(randomExperience)) {
-            return false
-          }
-        }
-
-        // For other filters, we would apply similar logic
-        // but for demo purposes, we'll just return true for the rest
-        return true
-      })
-
-      setResults(filteredJobs)
-      if (filteredJobs.length > 0) {
+      const jobs: Job[] = await response.json()
+      // Add unique IDs to each job
+      const jobsWithIds: JobWithId[] = jobs.map((job: Job, index: number) => ({
+        ...job,
+        id: generateJobId(job, index),
+      }))
+      setResults(jobsWithIds)
+      if (jobsWithIds.length > 0) {
         setSelectedJobIndex(0)
       }
     } catch (err: any) {
@@ -239,18 +184,17 @@ export default function JobsPage() {
   }
 
   // Filter jobs based on saved status if needed
-  const filteredResults = showSavedOnly ? results.filter((job) => savedJobs.includes(job.id)) : results
+  const filteredResults: JobWithId[] = showSavedOnly ? results.filter((job) => savedJobs.includes(job.id)) : results
 
   // Calculate pagination values
-  const indexOfLastJob = currentPage * jobsPerPage
-  const indexOfFirstJob = indexOfLastJob - jobsPerPage
-  const currentJobs = filteredResults.slice(indexOfFirstJob, indexOfLastJob)
-  const totalPages = Math.ceil(filteredResults.length / jobsPerPage)
+  const indexOfLastJob: number = currentPage * jobsPerPage
+  const indexOfFirstJob: number = indexOfLastJob - jobsPerPage
+  const currentJobs: JobWithId[] = filteredResults.slice(indexOfFirstJob, indexOfLastJob)
+  const totalPages: number = Math.ceil(filteredResults.length / jobsPerPage)
 
   // Change page
-  const paginate = (pageNumber: number) => {
+  const paginate = (pageNumber: number): void => {
     setCurrentPage(pageNumber)
-    // Adjust selected job index to match the new page
     if (selectedJobIndex !== null) {
       const globalIndex = indexOfFirstJob + (selectedJobIndex % jobsPerPage)
       if (globalIndex < filteredResults.length) {
@@ -261,25 +205,25 @@ export default function JobsPage() {
     }
   }
 
-  const nextPage = () => {
+  const nextPage = (): void => {
     if (currentPage < totalPages) {
       paginate(currentPage + 1)
     }
   }
 
-  const prevPage = () => {
+  const prevPage = (): void => {
     if (currentPage > 1) {
       paginate(currentPage - 1)
     }
   }
 
   // Handle job selection with pagination
-  const handleJobSelection = (localIndex: number) => {
+  const handleJobSelection = (localIndex: number): void => {
     const globalIndex = results.findIndex((job) => job.id === filteredResults[indexOfFirstJob + localIndex].id)
     setSelectedJobIndex(globalIndex)
   }
 
-  const selectedJob = selectedJobIndex !== null ? results[selectedJobIndex] : null
+  const selectedJob: JobWithId | null = selectedJobIndex !== null ? results[selectedJobIndex] : null
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -343,66 +287,11 @@ export default function JobsPage() {
           <div className="space-y-6">
             {/* Main Search Card */}
             <div className="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
-              <div className="p-6 pb-4">
+              <div className="p-6">
                 <h1 className="text-3xl font-bold text-center text-gray-900">Find Your Dream Job</h1>
                 <p className="text-center text-gray-500 text-base mt-2">
-                  Select job titles and locations to start your search
+                  Browse all available job listings
                 </p>
-              </div>
-              <div className="px-6 pb-6">
-                <div className="flex flex-col md:flex-row gap-6 mb-6">
-                  {/* Mobile Filter Button */}
-                  <button
-                    className="md:hidden w-full mb-2 py-2 px-4 border border-gray-300 rounded-md flex items-center justify-center text-sm font-medium text-gray-700"
-                    onClick={() => setFilterOpen(true)}
-                  >
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter Options
-                  </button>
-
-                  {/* Mobile Filter Sidebar */}
-                  <MobileFilters
-                    jobOptions={jobOptions}
-                    locationOptions={locationOptions}
-                    selectedJobs={selectedJobs}
-                    selectedLocations={selectedLocations}
-                    handleJobToggle={handleJobToggle}
-                    handleLocationToggle={handleLocationToggle}
-                    filterOpen={filterOpen}
-                    setFilterOpen={setFilterOpen}
-                  />
-
-                  {/* Desktop Filters */}
-                  <DesktopFilters
-                    jobOptions={jobOptions}
-                    locationOptions={locationOptions}
-                    selectedJobs={selectedJobs}
-                    selectedLocations={selectedLocations}
-                    handleJobToggle={handleJobToggle}
-                    handleLocationToggle={handleLocationToggle}
-                  />
-                </div>
-
-                <div className="flex justify-center">
-                  <button
-                    onClick={fetchJobs}
-                    className={`px-8 py-3 rounded-md text-white font-medium flex items-center justify-center ${
-                      loading || selectedJobs.length === 0 || selectedLocations.length === 0
-                        ? "bg-blue-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                    disabled={loading || selectedJobs.length === 0 || selectedLocations.length === 0}
-                  >
-                    {loading ? (
-                      "Searching..."
-                    ) : (
-                      <>
-                        <Search className="mr-2 h-4 w-4" />
-                        Find Jobs
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
             </div>
 

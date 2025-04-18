@@ -65,6 +65,7 @@ export function AdvancedFilters({
     "Airbnb",
     "Uber",
     "Twitter",
+    "Salesforce"
   ]
 
   const industryOptions = [

@@ -64,47 +64,6 @@ const UserSchema: Schema<User> = new Schema(
   { timestamps: true }
 );
 
-// Notification Interface and Schema (Unchanged)
-export interface Notification extends Document {
-  userID: mongoose.Types.ObjectId;
-  message: string;
-  timestamp: Date;
-}
-
-const NotificationSchema: Schema<Notification> = new Schema(
-  {
-    userID: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    message: { type: String, required: true, trim: true },
-    timestamp: { type: Date, default: Date.now },
-  },
-  { timestamps: true }
-);
-
-// Admin Interface and Schema (Unchanged)
-export interface Admin extends Document {
-  name: string;
-  email: string;
-  password: string;
-}
-
-const AdminSchema: Schema<Admin> = new Schema(
-  {
-    name: { type: String, required: true, trim: true },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-      match: [
-        /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-        "Please enter a valid email address",
-      ],
-    },
-    password: { type: String, required: true },
-  },
-  { timestamps: true }
-);
 
 // Job Scraper Interface and Schema (Unchanged)
 export interface JobScraper extends Document {
@@ -124,34 +83,31 @@ const JobScraperSchema: Schema<JobScraper> = new Schema(
 
 // Job Interface and Schema (Updated)
 export interface Job extends Document {
-  title: string;
-  company: string;
+  job_title: string;
+  company_name: string;
+  job_location: string;
+  job_type: string;
   salary?: string;
-  location: string;
+  apply_link?: string;
+  skills_required: string[];
   description: string;
-  type: string;
-  requirements: string[];
-  experience?: string;
-  postedDate?: Date;
-  applyLink?: string;
+  job_link: string;
 }
 
 const JobSchema: Schema<Job> = new Schema(
   {
-    title: { type: String, required: true, trim: true },
-    company: { type: String, required: true, trim: true },
+    job_title: { type: String, required: true, trim: true },
+    company_name: { type: String, required: true, trim: true },
+    job_location: { type: String, required: true, trim: true },
+    job_type: { type: String, required: true, trim: true },
     salary: { type: String, trim: true },
-    location: { type: String, required: true, trim: true },
+    apply_link: { type: String, trim: true },
+    skills_required: [{ type: String, trim: true }],
     description: { type: String, required: true, trim: true },
-    type: { type: String, required: true, trim: true },
-    requirements: [{ type: String, trim: true }],
-    experience: { type: String, trim: true },
-    postedDate: { type: Date },
-    applyLink: { type: String, trim: true },
+    job_link: { type: String, required: true, trim: true },
   },
   { timestamps: true }
 );
-
 // Job Application Interface and Schema (Unchanged)
 export interface JobApplication extends Document {
   userID: mongoose.Types.ObjectId;
@@ -198,25 +154,10 @@ UserSchema.pre<User>("save", async function (next) {
   next();
 });
 
-AdminSchema.pre<Admin>("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-
 // Model Exports
 const UserModel =
   (mongoose.models.User as mongoose.Model<User>) ||
   mongoose.model<User>("User", UserSchema);
-
-const NotificationModel =
-  (mongoose.models.Notification as mongoose.Model<Notification>) ||
-  mongoose.model<Notification>("Notification", NotificationSchema);
-
-const AdminModel =
-  (mongoose.models.Admin as mongoose.Model<Admin>) ||
-  mongoose.model<Admin>("Admin", AdminSchema);
 
 const JobScraperModel =
   (mongoose.models.JobScraper as mongoose.Model<JobScraper>) ||
@@ -236,8 +177,6 @@ const JobRecommendationModel =
 
 export {
   UserModel,
-  NotificationModel,
-  AdminModel,
   JobScraperModel,
   JobModel,
   JobApplicationModel,
