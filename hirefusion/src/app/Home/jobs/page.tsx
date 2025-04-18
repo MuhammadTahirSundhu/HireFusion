@@ -1,13 +1,14 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Filter, Search, Bookmark, Bell } from "lucide-react"
+import { Filter, Search, Bookmark, Bell, Sparkles, Sliders } from "lucide-react"
 import { JobCard, type JobWithId, type Job } from "@/components/job-card"
 import { JobDetails } from "@/components/job-details"
 import { JobCardSkeleton, JobDetailsSkeleton } from "@/components/skeleton-loader"
 import { MobileFilters, DesktopFilters } from "@/components/job-filters"
 import { Pagination } from "@/components/pagination"
 import { JobAlerts } from "@/components/job-alerts"
-// import { AdvancedFilters, type FilterOptions } from "@/components/advanced-filters"
+import { AdvancedFilters, type FilterOptions } from "@/components/advanced-filters"
+import { RecommendedJobs } from "@/components/recommended-jobs"
 
 const jobOptions = [
   "Frontend Developer",
@@ -34,29 +35,29 @@ export default function JobsPage() {
   const [scrollPosition, setScrollPosition] = useState(0)
   const [savedJobs, setSavedJobs] = useState<string[]>([]) // Array of job IDs
   const [showSavedOnly, setShowSavedOnly] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState("search")
+  const [activeTab, setActiveTab] = useState("all-jobs")
 
   // Advanced filters state
-  // const [advancedFilterOptions, setAdvancedFilterOptions] = useState<FilterOptions>({
-  //   jobTypes: [],
-  //   experienceLevels: [],
-  //   salaryRange: [0, 250000],
-  //   skills: [],
-  //   companies: [],
-  //   industries: [],
-  //   datePosted: null,
-  //   remoteOptions: [],
-  // })
-  // const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterOptions>({
-  //   jobTypes: [],
-  //   experienceLevels: [],
-  //   salaryRange: [0, 250000],
-  //   skills: [],
-  //   companies: [],
-  //   industries: [],
-  //   datePosted: null,
-  //   remoteOptions: [],
-  // })
+  const [advancedFilterOptions, setAdvancedFilterOptions] = useState<FilterOptions>({
+    jobTypes: [],
+    experienceLevels: [],
+    salaryRange: [0, 250000],
+    skills: [],
+    companies: [],
+    industries: [],
+    datePosted: null,
+    remoteOptions: [],
+  })
+  const [appliedFilterOptions, setAppliedFilterOptions] = useState<FilterOptions>({
+    jobTypes: [],
+    experienceLevels: [],
+    salaryRange: [0, 250000],
+    skills: [],
+    companies: [],
+    industries: [],
+    datePosted: null,
+    remoteOptions: [],
+  })
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
@@ -122,46 +123,33 @@ export default function JobsPage() {
     return `${baseId}-${index}-${uniqueSuffix}`
   }
 
-  // const applyAdvancedFilters = () => {
-  //   setAppliedFilterOptions(advancedFilterOptions)
-  //   fetchJobs()
-  // }
+  const applyAdvancedFilters = () => {
+    setAppliedFilterOptions(advancedFilterOptions)
+    fetchJobs()
+  }
 
-  // const resetAdvancedFilters = () => {
-  //   setAdvancedFilterOptions({
-  //     jobTypes: [],
-  //     experienceLevels: [],
-  //     salaryRange: [0, 250000],
-  //     skills: [],
-  //     companies: [],
-  //     industries: [],
-  //     datePosted: null,
-  //     remoteOptions: [],
-  //   })
-  //   setAppliedFilterOptions({
-  //     jobTypes: [],
-  //     experienceLevels: [],
-  //     salaryRange: [0, 250000],
-  //     skills: [],
-  //     companies: [],
-  //     industries: [],
-  //     datePosted: null,
-  //     remoteOptions: [],
-  //   })
-  // }
-
-  // const getActiveFilterCount = () => {
-  //   return (
-  //     advancedFilterOptions.jobTypes.length +
-  //     advancedFilterOptions.experienceLevels.length +
-  //     advancedFilterOptions.skills.length +
-  //     advancedFilterOptions.companies.length +
-  //     advancedFilterOptions.industries.length +
-  //     advancedFilterOptions.remoteOptions.length +
-  //     (advancedFilterOptions.datePosted ? 1 : 0) +
-  //     (advancedFilterOptions.salaryRange[0] > 0 || advancedFilterOptions.salaryRange[1] < 250000 ? 1 : 0)
-  //   )
-  // }
+  const resetAdvancedFilters = () => {
+    setAdvancedFilterOptions({
+      jobTypes: [],
+      experienceLevels: [],
+      salaryRange: [0, 250000],
+      skills: [],
+      companies: [],
+      industries: [],
+      datePosted: null,
+      remoteOptions: [],
+    })
+    setAppliedFilterOptions({
+      jobTypes: [],
+      experienceLevels: [],
+      salaryRange: [0, 250000],
+      skills: [],
+      companies: [],
+      industries: [],
+      datePosted: null,
+      remoteOptions: [],
+    })
+  }
 
   const fetchJobs = async () => {
     setLoading(true)
@@ -207,38 +195,37 @@ export default function JobsPage() {
       }, [])
 
       // Apply advanced filters
-      const filteredJobs = uniqueJobs
-      // const filteredJobs = uniqueJobs.filter((job) => {
-      //   // Filter by job type
-      //   if (appliedFilterOptions.jobTypes.length > 0 && job["job-type"]) {
-      //     if (
-      //       !appliedFilterOptions.jobTypes.some((type) => job["job-type"]?.toLowerCase().includes(type.toLowerCase()))
-      //     ) {
-      //       return false
-      //     }
-      //   }
+      const filteredJobs = uniqueJobs.filter((job) => {
+        // Filter by job type
+        if (appliedFilterOptions.jobTypes.length > 0 && job["job-type"]) {
+          if (
+            !appliedFilterOptions.jobTypes.some((type) => job["job-type"]?.toLowerCase().includes(type.toLowerCase()))
+          ) {
+            return false
+          }
+        }
 
-      //   // For demo purposes, we'll randomly assign other properties to jobs
-      //   // In a real app, these would come from the API
-      //   const randomSalary = 40000 + Math.floor(Math.random() * 160000)
-      //   const randomExperience = experienceLevelOptions[Math.floor(Math.random() * experienceLevelOptions.length)]
+        // For demo purposes, we'll randomly assign other properties to jobs
+        // In a real app, these would come from the API
+        const randomSalary = 40000 + Math.floor(Math.random() * 160000)
+        const randomExperience = experienceLevelOptions[Math.floor(Math.random() * experienceLevelOptions.length)]
 
-      //   // Filter by salary
-      //   if (randomSalary < appliedFilterOptions.salaryRange[0] || randomSalary > appliedFilterOptions.salaryRange[1]) {
-      //     return false
-      //   }
+        // Filter by salary
+        if (randomSalary < appliedFilterOptions.salaryRange[0] || randomSalary > appliedFilterOptions.salaryRange[1]) {
+          return false
+        }
 
-      //   // Filter by experience level
-      //   if (appliedFilterOptions.experienceLevels.length > 0) {
-      //     if (!appliedFilterOptions.experienceLevels.includes(randomExperience)) {
-      //       return false
-      //     }
-      //   }
+        // Filter by experience level
+        if (appliedFilterOptions.experienceLevels.length > 0) {
+          if (!appliedFilterOptions.experienceLevels.includes(randomExperience)) {
+            return false
+          }
+        }
 
-      //   // For other filters, we would apply similar logic
-      //   // but for demo purposes, we'll just return true for the rest
-      //   return true
-      // })
+        // For other filters, we would apply similar logic
+        // but for demo purposes, we'll just return true for the rest
+        return true
+      })
 
       setResults(filteredJobs)
       if (filteredJobs.length > 0) {
@@ -299,16 +286,42 @@ export default function JobsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Custom Tabs */}
         <div className="mb-6 border-b border-gray-200">
-          <div className="flex -mb-px">
+          <div className="flex flex-wrap -mb-px">
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
-                activeTab === "search"
+                activeTab === "all-jobs"
                   ? "border-blue-500 text-blue-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
-              onClick={() => setActiveTab("search")}
+              onClick={() => setActiveTab("all-jobs")}
             >
-              Search Jobs
+              All Jobs
+            </button>
+            <button
+              className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
+                activeTab === "recommended"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+              onClick={() => setActiveTab("recommended")}
+            >
+              <div className="flex items-center">
+                Recommended
+                <Sparkles className="ml-1 h-4 w-4" />
+              </div>
+            </button>
+            <button
+              className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
+                activeTab === "filters"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+              onClick={() => setActiveTab("filters")}
+            >
+              <div className="flex items-center">
+                Advanced Filters
+                <Sliders className="ml-1 h-4 w-4" />
+              </div>
             </button>
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
@@ -326,7 +339,7 @@ export default function JobsPage() {
           </div>
         </div>
 
-        {activeTab === "search" && (
+        {activeTab === "all-jobs" && (
           <div className="space-y-6">
             {/* Main Search Card */}
             <div className="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
@@ -392,15 +405,6 @@ export default function JobsPage() {
                 </div>
               </div>
             </div>
-
-            {/* Advanced Filters */}
-            {/* <AdvancedFilters
-              filterOptions={advancedFilterOptions}
-              setFilterOptions={setAdvancedFilterOptions}
-              applyFilters={applyAdvancedFilters}
-              resetFilters={resetAdvancedFilters}
-              activeFilterCount={getActiveFilterCount()}
-            /> */}
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-8">
@@ -524,6 +528,24 @@ export default function JobsPage() {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === "recommended" && (
+          <RecommendedJobs
+            jobOptions={jobOptions}
+            locationOptions={locationOptions}
+            savedJobs={savedJobs}
+            toggleSaveJob={toggleSaveJob}
+          />
+        )}
+
+        {activeTab === "filters" && (
+          <AdvancedFilters
+            filterOptions={advancedFilterOptions}
+            setFilterOptions={setAdvancedFilterOptions}
+            applyFilters={applyAdvancedFilters}
+            resetFilters={resetAdvancedFilters}
+          />
         )}
 
         {activeTab === "alerts" && (

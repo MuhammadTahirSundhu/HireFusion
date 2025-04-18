@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Filter, ChevronDown, ChevronUp, X, Check } from 'lucide-react'
+import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react'
 
 export interface FilterOptions {
   jobTypes: string[]
@@ -18,7 +18,6 @@ interface AdvancedFiltersProps {
   setFilterOptions: (options: FilterOptions) => void
   applyFilters: () => void
   resetFilters: () => void
-  activeFilterCount: number
 }
 
 export function AdvancedFilters({
@@ -26,10 +25,7 @@ export function AdvancedFilters({
   setFilterOptions,
   applyFilters,
   resetFilters,
-  activeFilterCount,
 }: AdvancedFiltersProps) {
-  const [expanded, setExpanded] = useState(false)
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "job-type": true,
     "experience": true,
@@ -176,15 +172,6 @@ export function AdvancedFilters({
     })
   }
 
-  const removeFilter = (type: keyof FilterOptions, value: string) => {
-    if (type === "salaryRange" || type === "datePosted") return
-
-    setFilterOptions({
-      ...filterOptions,
-      [type]: (filterOptions[type] as string[]).filter((item) => item !== value),
-    })
-  }
-
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -192,280 +179,124 @@ export function AdvancedFilters({
     }))
   }
 
+  const getActiveFilterCount = () => {
+    return (
+      filterOptions.jobTypes.length +
+      filterOptions.experienceLevels.length +
+      filterOptions.skills.length +
+      filterOptions.companies.length +
+      filterOptions.industries.length +
+      filterOptions.remoteOptions.length +
+      (filterOptions.datePosted ? 1 : 0) +
+      (filterOptions.salaryRange[0] > 0 || filterOptions.salaryRange[1] < 250000 ? 1 : 0)
+    )
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-md mb-6">
-      <div className="p-4 border-b flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-          Filters
-          {activeFilterCount > 0 && (
-            <span className="ml-2 bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
-              {activeFilterCount}
-            </span>
-          )}
-        </h2>
-        <div className="flex items-center gap-2">
-          {activeFilterCount > 0 && (
-            <button 
-              className="text-sm text-gray-600 hover:text-gray-900"
-              onClick={resetFilters}
-            >
-              Clear All
-            </button>
-          )}
-          <button
-            className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? (
-              <>
-                <ChevronUp className="h-4 w-4" />
-                Collapse
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                Expand
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Active Filters */}
-      {activeFilterCount > 0 && (
-        <div className="p-4 border-b bg-gray-50">
-          <div className="flex flex-wrap gap-2">
-            {filterOptions.jobTypes.map((type) => (
-              <span key={type} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {type}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("jobTypes", type)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.experienceLevels.map((level) => (
-              <span key={level} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {level}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("experienceLevels", level)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.skills.map((skill) => (
-              <span key={skill} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {skill}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("skills", skill)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.companies.map((company) => (
-              <span key={company} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {company}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("companies", company)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.industries.map((industry) => (
-              <span key={industry} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {industry}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("industries", industry)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.remoteOptions.map((option) => (
-              <span key={option} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {option}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => removeFilter("remoteOptions", option)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-            {filterOptions.datePosted && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {datePostedOptions.find((o) => o.value === filterOptions.datePosted)?.label}
-                <button 
-                  className="ml-1 text-gray-500 hover:text-gray-700"
-                  onClick={() => handleDatePostedChange(null)}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            )}
-            {(filterOptions.salaryRange[0] > 0 || filterOptions.salaryRange[1] < 250000) && (
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {formatSalary(filterOptions.salaryRange[0])} - {formatSalary(filterOptions.salaryRange[1])}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Filter Button */}
-      <div className="md:hidden p-4">
-        <button
-          className="w-full py-2 px-4 border border-gray-300 rounded-md flex items-center justify-center text-sm font-medium text-gray-700"
-          onClick={() => setMobileFilterOpen(true)}
-        >
-          <Filter className="h-4 w-4 mr-2" />
-          Advanced Filters
-          {activeFilterCount > 0 && (
-            <span className="ml-2 bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
-              {activeFilterCount}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Filter Modal */}
-      {mobileFilterOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-          <div className="absolute right-0 top-0 h-full w-full max-w-xs bg-white shadow-xl overflow-y-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-medium text-lg">Advanced Filters</h3>
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Advanced Filters</h2>
+        <p className="text-gray-500 mb-6">Refine your job search with detailed filters</p>
+        
+        {getActiveFilterCount() > 0 && (
+          <div className="mb-6 p-4 border-b bg-gray-50 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-medium">Active Filters</h3>
               <button 
-                className="text-gray-400 hover:text-gray-500"
-                onClick={() => setMobileFilterOpen(false)}
+                className="text-sm text-gray-600 hover:text-gray-900"
+                onClick={resetFilters}
               >
-                <X className="h-5 w-5" />
+                Clear All
               </button>
             </div>
-            <div className="p-4 space-y-6">
-              <MobileFilterSection
-                title="Job Type"
-                options={jobTypeOptions}
-                selected={filterOptions.jobTypes}
-                onToggle={handleJobTypeToggle}
-              />
-              <MobileFilterSection
-                title="Experience Level"
-                options={experienceLevelOptions}
-                selected={filterOptions.experienceLevels}
-                onToggle={handleExperienceLevelToggle}
-              />
-              <MobileFilterSection
-                title="Skills"
-                options={skillOptions}
-                selected={filterOptions.skills}
-                onToggle={handleSkillToggle}
-              />
-              <MobileFilterSection
-                title="Companies"
-                options={companyOptions}
-                selected={filterOptions.companies}
-                onToggle={handleCompanyToggle}
-              />
-              <MobileFilterSection
-                title="Industries"
-                options={industryOptions}
-                selected={filterOptions.industries}
-                onToggle={handleIndustryToggle}
-              />
-              <MobileFilterSection
-                title="Remote Options"
-                options={remoteOptions}
-                selected={filterOptions.remoteOptions}
-                onToggle={handleRemoteToggle}
-              />
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Date Posted</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {datePostedOptions.map((option) => (
-                    <button
-                      key={option.label}
-                      className={`px-3 py-1.5 text-sm border rounded-md ${
-                        filterOptions.datePosted === option.value
-                          ? "bg-blue-50 border-blue-200 text-blue-700"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                      onClick={() => handleDatePostedChange(option.value)}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Salary Range</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Minimum</label>
-                    <input
-                      type="number"
-                      value={filterOptions.salaryRange[0]}
-                      onChange={(e) => handleSalaryMinChange(Number(e.target.value))}
-                      min="0"
-                      max="250000"
-                      step="5000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Maximum</label>
-                    <input
-                      type="number"
-                      value={filterOptions.salaryRange[1]}
-                      onChange={(e) => handleSalaryMaxChange(Number(e.target.value))}
-                      min="0"
-                      max="250000"
-                      step="5000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm text-gray-500 mt-1">
-                  <span>{formatSalary(filterOptions.salaryRange[0])}</span>
-                  <span>{formatSalary(filterOptions.salaryRange[1])}</span>
-                </div>
-              </div>
-
-              <div className="flex justify-between pt-4 border-t">
-                <button
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  onClick={resetFilters}
-                >
-                  Reset
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700"
-                  onClick={() => {
-                    applyFilters()
-                    setMobileFilterOpen(false)
-                  }}
-                >
-                  Apply Filters
-                </button>
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {filterOptions.jobTypes.map((type) => (
+                <span key={type} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {type}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleJobTypeToggle(type)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.experienceLevels.map((level) => (
+                <span key={level} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {level}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleExperienceLevelToggle(level)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.skills.map((skill) => (
+                <span key={skill} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {skill}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleSkillToggle(skill)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.companies.map((company) => (
+                <span key={company} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {company}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleCompanyToggle(company)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.industries.map((industry) => (
+                <span key={industry} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {industry}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleIndustryToggle(industry)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.remoteOptions.map((option) => (
+                <span key={option} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {option}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleRemoteToggle(option)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {filterOptions.datePosted && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {datePostedOptions.find((o) => o.value === filterOptions.datePosted)?.label}
+                  <button 
+                    className="ml-1 text-gray-500 hover:text-gray-700"
+                    onClick={() => handleDatePostedChange(null)}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(filterOptions.salaryRange[0] > 0 || filterOptions.salaryRange[1] < 250000) && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                  {formatSalary(filterOptions.salaryRange[0])} - {formatSalary(filterOptions.salaryRange[1])}
+                </span>
+              )}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Desktop Filters */}
-      <div className={`hidden md:block transition-all duration-300 ${expanded ? 'max-h-[2000px]' : 'max-h-0 overflow-hidden'}`}>
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Job Type Section */}
           <div className="border rounded-md overflow-hidden">
             <button
@@ -481,7 +312,7 @@ export function AdvancedFilters({
             </button>
             {expandedSections["job-type"] && (
               <div className="p-3">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {jobTypeOptions.map((type) => (
                     <label key={type} className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -513,7 +344,7 @@ export function AdvancedFilters({
             </button>
             {expandedSections["experience"] && (
               <div className="p-3">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {experienceLevelOptions.map((level) => (
                     <label key={level} className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -594,7 +425,7 @@ export function AdvancedFilters({
             </button>
             {expandedSections["skills"] && (
               <div className="p-3">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {skillOptions.map((skill) => (
                     <label key={skill} className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -626,7 +457,7 @@ export function AdvancedFilters({
             </button>
             {expandedSections["companies"] && (
               <div className="p-3">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {companyOptions.map((company) => (
                     <label key={company} className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -658,7 +489,7 @@ export function AdvancedFilters({
             </button>
             {expandedSections["remote"] && (
               <div className="p-3">
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   {remoteOptions.map((option) => (
                     <label key={option} className="flex items-center space-x-2 cursor-pointer">
                       <input
@@ -710,7 +541,7 @@ export function AdvancedFilters({
           </div>
         </div>
 
-        <div className="p-4 border-t flex justify-end gap-2">
+        <div className="mt-6 flex justify-end gap-2">
           <button
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             onClick={resetFilters}
@@ -724,40 +555,6 @@ export function AdvancedFilters({
             Apply Filters
           </button>
         </div>
-      </div>
-    </div>
-  )
-}
-
-// Helper component for mobile filters
-function MobileFilterSection({
-  title,
-  options,
-  selected,
-  onToggle,
-}: {
-  title: string
-  options: string[]
-  selected: string[]
-  onToggle: (option: string) => void
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{title}</label>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <button
-            key={option}
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              selected.includes(option)
-                ? "bg-blue-100 text-blue-800 border border-blue-200"
-                : "bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200"
-            }`}
-            onClick={() => onToggle(option)}
-          >
-            {option}
-          </button>
-        ))}
       </div>
     </div>
   )
