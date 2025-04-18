@@ -64,7 +64,7 @@ const UserSchema: Schema<User> = new Schema(
   { timestamps: true }
 );
 
-// Notification Interface and Schema
+// Notification Interface and Schema (Unchanged)
 export interface Notification extends Document {
   userID: mongoose.Types.ObjectId;
   message: string;
@@ -80,7 +80,7 @@ const NotificationSchema: Schema<Notification> = new Schema(
   { timestamps: true }
 );
 
-// Admin Interface and Schema
+// Admin Interface and Schema (Unchanged)
 export interface Admin extends Document {
   name: string;
   email: string;
@@ -106,7 +106,7 @@ const AdminSchema: Schema<Admin> = new Schema(
   { timestamps: true }
 );
 
-// Job Scraper Interface and Schema
+// Job Scraper Interface and Schema (Unchanged)
 export interface JobScraper extends Document {
   sourceWebsite: string;
   scrapingInterval: string;
@@ -122,7 +122,7 @@ const JobScraperSchema: Schema<JobScraper> = new Schema(
   { timestamps: true }
 );
 
-// Job Interface and Schema
+// Job Interface and Schema (Updated)
 export interface Job extends Document {
   title: string;
   company: string;
@@ -131,6 +131,9 @@ export interface Job extends Document {
   description: string;
   type: string;
   requirements: string[];
+  experience?: string;
+  postedDate?: Date;
+  applyLink?: string;
 }
 
 const JobSchema: Schema<Job> = new Schema(
@@ -142,11 +145,14 @@ const JobSchema: Schema<Job> = new Schema(
     description: { type: String, required: true, trim: true },
     type: { type: String, required: true, trim: true },
     requirements: [{ type: String, trim: true }],
+    experience: { type: String, trim: true },
+    postedDate: { type: Date },
+    applyLink: { type: String, trim: true },
   },
   { timestamps: true }
 );
 
-// Job Application Interface and Schema
+// Job Application Interface and Schema (Unchanged)
 export interface JobApplication extends Document {
   userID: mongoose.Types.ObjectId;
   jobID: mongoose.Types.ObjectId;
@@ -168,7 +174,7 @@ const JobApplicationSchema: Schema<JobApplication> = new Schema(
   { timestamps: true }
 );
 
-// Job Recommendation Interface and Schema
+// Job Recommendation Interface and Schema (Unchanged)
 export interface JobRecommendation extends Document {
   userID: mongoose.Types.ObjectId;
   jobID: mongoose.Types.ObjectId;
@@ -184,7 +190,7 @@ const JobRecommendationSchema: Schema<JobRecommendation> = new Schema(
   { timestamps: true }
 );
 
-// Password hashing middleware for User and Admin
+// Password hashing middleware for User and Admin (Unchanged)
 UserSchema.pre<User>("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
