@@ -59,7 +59,7 @@ export default function Navbar() {
     { href: "/Home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
     { href: "/Home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
     { href: "/saved-jobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
-    { href: "/companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
+    { href: "/Home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
     { href: "/resources", label: "Resources", icon: <FaRegFileAlt className="text-lg" /> },
     { href: "/Home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
   ]
