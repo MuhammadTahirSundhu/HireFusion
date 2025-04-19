@@ -37,7 +37,7 @@ export default function SignIn() {
                 setLoading(false);
             } else if (res?.ok) {
                 // Redirect after successful login
-                const destination = router.query?.redirect || "/home"; // Handle redirect if set
+                const destination = router.query?.redirect || "/Home"; // Handle redirect if set
                 router.push(destination); // Trigger the redirect to the destination
             } else {
                 // In case of unexpected response
