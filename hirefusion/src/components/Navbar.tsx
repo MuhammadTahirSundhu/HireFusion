@@ -56,12 +56,12 @@ export default function Navbar() {
   }, [pathname])
 
   const navItems = [
-    { href: "/Home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
-    { href: "/Home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
+    { href: "/home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
+    { href: "/home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
     { href: "/saved-jobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
-    { href: "/Home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
+    { href: "/home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
     { href: "/resources", label: "Resources", icon: <FaRegFileAlt className="text-lg" /> },
-    { href: "/Home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
+    { href: "/home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
   ]
 
   const handleSearch = (e: React.FormEvent) => {
@@ -81,7 +81,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo / Brand */}
           <div className="flex items-center">
-            <Link href="/Home" className="flex items-center">
+            <Link href="/home" className="flex items-center">
               <div className="relative h-8 w-8 mr-2">
                 <div className="absolute inset-0 bg-white dark:bg-gray-700 rounded-md flex items-center justify-center">
                   <span className="text-blue-600 dark:text-blue-400 font-bold text-lg">HF</span>
