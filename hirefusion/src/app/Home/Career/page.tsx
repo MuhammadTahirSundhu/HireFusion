@@ -4,6 +4,7 @@ import type React from "react"
 import { Text } from "@react-three/drei";
 import Image from "next/image"
 import Link from "next/link"
+import CareerChatbot from "@/components/career-chatbot"
 import { useEffect, useRef, useState } from "react"
 import {
   Briefcase,
@@ -1105,7 +1106,11 @@ export default function CareerAdvicePage(): JSX.Element {
           </motion.div>
         </motion.div>
       </section>
-
+      <CareerChatbot 
+        apiEndpoint="/api/chat"
+        botName="Career Advisor"
+        botAvatar="/images/bot-avatar.png"
+      />
       {/* Footer */}
       <footer className="py-16 px-6 bg-gray-950 text-white">
         <div className="max-w-7xl mx-auto">
