@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { Send, X } from "lucide-react"
 import ChatMessage from "./chat-message"
@@ -206,28 +205,47 @@ export default function CareerChatbot({
 
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
-      let done = false
       let accumulatedContent = ""
       let isFirstChunk = true
 
-      while (!done) {
+      while (true) {
         const { value, done: doneReading } = await reader.read()
-        done = doneReading
+        if (doneReading) break
 
         if (value) {
-          const chunkText = decoder.decode(value)
-          accumulatedContent += chunkText
+          const chunkText = decoder.decode(value, { stream: true })
+          // Split by newlines to handle multiple JSON objects
+          const lines = chunkText.split("\n")
 
-          // Play typing sound on first chunk
-          if (isFirstChunk && soundsLoaded && initialized) {
-            playSound("typing")
-            isFirstChunk = false
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const json = JSON.parse(line)
+                if (json.message && json.message.content) {
+                  accumulatedContent += json.message.content
+
+                  // Play typing sound on first chunk
+                  if (isFirstChunk && soundsLoaded && initialized) {
+                    playSound("typing")
+                    isFirstChunk = false
+                  }
+
+                  // Update the assistant message with the accumulated content
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === assistantMessage.id ? { ...m, content: accumulatedContent } : m
+                    )
+                  )
+                }
+                // Check if the stream is done
+                if (json.done) {
+                  break
+                }
+              } catch (error) {
+                console.error("Error parsing JSON chunk:", error)
+              }
+            }
           }
-
-          // Update the assistant message with the accumulated content
-          setMessages((prev) =>
-            prev.map((m) => (m.id === assistantMessage.id ? { ...m, content: accumulatedContent } : m)),
-          )
         }
       }
 
@@ -245,7 +263,7 @@ export default function CareerChatbot({
         onMessageReceived(completedMessage)
       }
     } catch (error) {
-      console.error("Error:", error)
+      console.error("Error processing stream:", error)
       // Update the assistant message with an error
       const errorMessage = {
         ...assistantMessage,
