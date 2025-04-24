@@ -14,44 +14,51 @@ const companies = [
     name: "Habib Bank Limited",
     logo: "🏦",
     description: "Looking for finance professionals and digital banking experts",
-    link: "https://www.hbl.com/careers",
+    link:"https://www.hbl.com/"
   },
   {
     id: 3,
     name: "Jazz",
     logo: "📱",
     description: "Recruiting telecom engineers and customer service specialists",
-    link: "https://www.jazz.com.pk/careers",
+    link: "https://www.jazz.com.pk",
   },
   {
     id: 4,
     name: "K-Electric",
     logo: "⚡",
     description: "Seeking electrical engineers and energy analysts",
+    link: "https://www.ke.com.pk",
+
+
   },
   {
     id: 5,
     name: "Engro Corporation",
     logo: "🏭",
     description: "Hiring chemical engineers and business development managers",
+    link: "https://www.engro.com",
   },
   {
     id: 6,
     name: "Daraz",
     logo: "🛒",
     description: "Looking for e-commerce specialists and logistics managers",
+    link:"https://www.daraz.pk",
   },
   {
     id: 7,
     name: "Lucky Cement",
     logo: "🏗️",
     description: "Recruiting civil engineers and supply chain professionals",
+    link:"https://www.luckycement.com",
   },
   {
     id: 8,
     name: "TCS",
     logo: "📦",
     description: "Seeking logistics coordinators and delivery operations managers",
+    link: "https://www.tcs.com.pk",
   },
 ]
 
