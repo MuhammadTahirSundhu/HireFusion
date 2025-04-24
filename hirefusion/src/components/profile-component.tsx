@@ -203,7 +203,7 @@ export default function ProfileComponent() {
 
     try {
       const response = await fetch("/api/users/updateuser", {
-        method: "PUT",
+        method: "Post",
         headers: {
           "Content-Type": "application/json",
         },

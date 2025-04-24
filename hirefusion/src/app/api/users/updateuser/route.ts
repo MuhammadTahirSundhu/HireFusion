@@ -1,63 +1,23 @@
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/options"
+import { NextRequest, NextResponse } from "next/server"
 import mongoose from "mongoose"
-import { NextApiRequest, NextApiResponse } from "next"
+import { UserModel } from "@/models/User" // Adjust the import path as necessary
 
-// Define the User schema (adjust based on your actual schema)
-const userSchema = new mongoose.Schema({
-  username: String,
-  email: String,
-  isVerified: Boolean,
-  skills: [String],
-  education: [
-    {
-      institution: String,
-      degree: String,
-      field: String,
-      startDate: String,
-      endDate: String,
-      current: Boolean,
-      _id: mongoose.Schema.Types.ObjectId,
-    },
-  ],
-  experience: String, // Stored as JSON string
-  preferences: String,
-  createdAt: Date,
-  updatedAt: Date,
-})
+// ... your User schema setup here
 
-const User = mongoose.models.UserModel || mongoose.model("UserModel", userSchema)
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "PUT") {
-    return res.status(405).json({ message: "Method Not Allowed" })
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    // Connect to MongoDB
+    const body = await req.json()
+    const { email, username, preferences, skills, education, experience } = body
+
+    if (!email || !username || !Array.isArray(skills) || !Array.isArray(education) || !Array.isArray(experience)) {
+      return NextResponse.json({ message: "Missing or invalid required fields" }, { status: 400 })
+    }
+
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(process.env.MONGODB_URI || "")
     }
 
-    // Get the session
-    const session = await getServerSession(req, res, authOptions)
-    if (!session || !session.user?.email) {
-      return res.status(401).json({ message: "Unauthorized: Please sign in" })
-    }
-
-    // Parse request body
-    const { email, username, preferences, skills, education, experience } = req.body
-    if (!email || email !== session.user.email) {
-      return res.status(403).json({ message: "Forbidden: You can only update your own profile" })
-    }
-
-    // Validate required fields
-    if (!username || !Array.isArray(skills) || !Array.isArray(education) || !Array.isArray(experience)) {
-      return res.status(400).json({ message: "Missing or invalid required fields" })
-    }
-
-    // Update the user
-    const updatedUser = await User.findOneAndUpdate(
+    const updatedUser = await UserModel.findOneAndUpdate(
       { email },
       {
         username,
@@ -74,13 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
 
     if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" })
+      return NextResponse.json({ message: "User not found" }, { status: 404 })
     }
 
-    // Return the updated profile
-    res.status(200).json({ profile: updatedUser })
+    return NextResponse.json({ profile: updatedUser }, { status: 200 })
   } catch (error) {
     console.error("Error updating user:", error)
-    res.status(500).json({ message: "Internal server error" })
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 })
   }
 }
