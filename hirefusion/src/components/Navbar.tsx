@@ -180,13 +180,13 @@ export default function Navbar() {
                     <p className="text-xs text-gray-500 dark:text-gray-400">john.doe@example.com</p>
                   </div>
                   <Link
-                    href="/Home/profile"
+                    href="/home/profile"
                     className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                   >
                     <FaUserCircle className="mr-2" /> Your Profile
                   </Link>
                   <Link
-                    href="/Home/settings"
+                    href="/home/settings"
                     className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                   >
                     <FaCog className="mr-2" /> Settings

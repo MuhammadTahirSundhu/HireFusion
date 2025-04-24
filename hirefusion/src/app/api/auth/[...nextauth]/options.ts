@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
-import {UserModel} from '@/models/User';
+import { UserModel } from '@/models/User';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -20,9 +20,6 @@ export const authOptions: NextAuthOptions = {
           if (!user) {
             throw new Error('No user found with this email');
           }
-          if (!user) {
-            throw new Error('No user found with this email');
-          }
           if (!user.isVerified) {
             throw new Error('Please verify your account before logging in');
           }
@@ -35,11 +32,10 @@ export const authOptions: NextAuthOptions = {
           }
 
           return {
-            id: user._id.toString(),
+            id: user.id.toString(),
             name: user.username,
             email: user.email,
             isVerified: user.isVerified,
-            isAcceptingMessages: user.isAcceptingMessages,
           };
         } catch (err: any) {
           throw new Error(err.message || 'Authentication failed');
@@ -51,18 +47,20 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token._id = user.id;
+        token.email = user.email;
         token.isVerified = user.isVerified;
         token.isAcceptingMessages = user.isAcceptingMessages;
-        token.username = user.name;
+        token.username = user.name ?? undefined;
       }
       return token;
     },
     async session({ session, token }) {
-      session.user = { 
-        _id: token._id, 
-        isVerified: token.isVerified, 
-        isAcceptingMessages: token.isAcceptingMessages, 
-        username: token.username 
+      session.user = {
+        _id: token._id,
+        email: token.email,
+        isVerified: token.isVerified,
+        isAcceptingMessages: token.isAcceptingMessages,
+        username: token.username,
       };
       return session;
     },

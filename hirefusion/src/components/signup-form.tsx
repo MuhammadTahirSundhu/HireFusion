@@ -399,7 +399,25 @@ export default function SignupForm() {
       if (!response.ok) {
         throw new Error(result.message || "Invalid OTP")
       }
-
+      try {
+     
+        const res = await fetch("/api/users/addprofile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formValues.email,     // ← identifier
+            ...profileValues          // ← skills, experience, preferences, etc.
+          }),
+        });
+    
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Error updating profile");
+    
+        // success handling ...
+      } catch (err) {
+        console.error(err);
+      }
+      
       setIsOtpVerified(true)
       window.location.href = "/signin"
     } catch (error: any) {
