@@ -13,6 +13,7 @@
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
     "@types/bcryptjs": "^2.4.6",
+    "autoprefixer": "^10.4.21",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "csv-writer": "^1.6.0",

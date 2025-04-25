@@ -170,44 +170,17 @@ export default function HomePage() {
   ]
 
   const activeJobs = activeTab === "recommended" ? recommendedJobs : activeTab === "recent" ? recentJobs : savedJobs
-
   const stats = [
     { icon: <Briefcase className="h-5 w-5 text-purple-600" />, label: "Jobs Viewed", value: "124" },
     { icon: <Star className="h-5 w-5 text-yellow-500" />, label: "Applications", value: "18" },
     { icon: <Bookmark className="h-5 w-5 text-blue-500" />, label: "Saved Jobs", value: "32" },
-    { icon: <TrendingUp className="h-5 w-5 text-green-500" />, label: "Interview Invites", value: "7" },
-  ]
-
+  
+  ];
+  
   return (
     <div
       className={`min-h-screen bg-gradient-to-br from-purple-50 to-white transition-opacity duration-500 ${isLoaded ? "opacity-100" : "opacity-0"}`}
     >
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="bg-purple-600 text-white p-2 rounded-lg">
-              <Briefcase className="h-6 w-6" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-800">Hire Fusion</h1>
-          </div>
-
-          <div className="flex items-center space-x-6">
-            <div className="relative">
-              <Bell className="h-6 w-6 text-gray-600 hover:text-purple-600 transition-colors cursor-pointer" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                3
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">
-                {session.user?.username?.charAt(0).toUpperCase() || "U"}
-              </div>
-              <span className="text-sm font-medium text-gray-700">{session.user?.username || "User"}</span>
-            </div>
-          </div>
-        </div>
-      </header>
 
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section with Animation */}
@@ -256,7 +229,7 @@ export default function HomePage() {
 
         {/* Stats Section */}
         <section className="mb-10 fade-in" style={{ animationDelay: "0.4s" }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {stats.map((stat, index) => (
               <div
                 key={index}
