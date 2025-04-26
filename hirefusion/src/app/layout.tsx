@@ -13,13 +13,13 @@ export const metadata: Metadata = {
 interface RootLayoutProps {
   children: React.ReactNode;
 }
-
+// landing page layout
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" >
       <AuthProvider>
         <body className={inter.className}>
-          {children}
+        {children}
         </body>
       </AuthProvider>
     </html>

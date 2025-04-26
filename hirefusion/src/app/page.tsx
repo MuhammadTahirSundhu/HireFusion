@@ -1,5 +1,5 @@
 "use client"
-/// after login page (Home)
+// landing page 
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
