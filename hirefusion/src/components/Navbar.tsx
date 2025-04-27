@@ -58,7 +58,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
     { href: "/home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
-    { href: "/saved-jobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
+    { href: "/home/saved-jobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
     { href: "/home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
     { href: "/home/resources", label: "Resources", icon: <FaRegFileAlt className="text-lg" /> },
     { href: "/home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
