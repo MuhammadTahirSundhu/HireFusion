@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
     try {
       const { searchParams } = new URL(req.url);
       const email = searchParams.get("email");
-  
+      console.log("Email:", email); // Debugging line
+      
       if (!email || !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/.test(email)) {
         return NextResponse.json(
           { message: "Invalid or missing email" },
