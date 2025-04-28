@@ -9,7 +9,7 @@ import { JobCardSkeleton, JobDetailsSkeleton } from "@/components/skeleton-loade
 import { Pagination } from "@/components/pagination";
 import { JobAlerts } from "@/components/job-alerts";
 import { AdvancedFilters, FilterOptions } from "@/components/advanced-filters";
-import { RecommendedJobs } from "@/components/recommended-jobs";
+import  RecommendedJobs  from "@/components/recommended-jobs";
 
 const jobOptions: string[] = [
   "Frontend Developer",

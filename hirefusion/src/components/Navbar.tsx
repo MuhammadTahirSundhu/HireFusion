@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react"
 import type React from "react"
 import { useSession } from "next-auth/react"
-import {  signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 
 import Link from "next/link"
@@ -38,6 +38,7 @@ export default function Navbar() {
   const { data: session, status } = useSession();
 
   const handleSignOut = async () => {
+    setIsProfileOpen(false)
     await signOut({ callbackUrl: "/signin" }); // Redirect to sign-in page after sign-out
   };
   // Close dropdowns when clicking outside
@@ -104,11 +105,10 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                  pathname.startsWith(item.href)
-                    ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400"
-                    : "text-blue-100 hover:bg-blue-500 dark:hover:bg-gray-700 hover:text-white"
-                }`}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${pathname.startsWith(item.href)
+                  ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400"
+                  : "text-blue-100 hover:bg-blue-500 dark:hover:bg-gray-700 hover:text-white"
+                  }`}
               >
                 <span className="mr-1.5">{item.icon}</span>
                 {item.label}
@@ -176,72 +176,74 @@ export default function Navbar() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 aria-label="Profile"
               >
-                <FaUserCircle className="text-xl" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 text-white font-bold text-lg">
+                  {session?.user?.username?.charAt(0).toUpperCase()}
+                </div>
                 <FaChevronDown className="text-xs" />
               </button>
 
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-                  <div className="px-4 py-2 border-b dark:border-gray-700">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">John Doe</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">john.doe@example.com</p>
-                  </div>
-                  <Link
-                    href="/home/profile"
-                    className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-                  >
-                    <FaUserCircle className="mr-2" /> Your Profile
-                  </Link>
-                  <Link
-                    href="/home/settings"
-                    className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-                  >
-                    <FaCog className="mr-2" /> Settings
-                  </Link>
-                  <div className="border-t dark:border-gray-700">
-                    <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-                      <FaSignOutAlt className="mr-2" /> Sign out
-                    </button>
-                  </div>
+
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+                <div className="px-4 py-2 border-b dark:border-gray-700">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {session?.user?.username || "User"}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {session?.user?.email}
+                  </p>
+
                 </div>
-              )}
-            </div>
+                <Link
+                  href="/home/profile"
+                  onClick={() => setIsProfileOpen(false)}
+                  className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                >
+                  <FaUserCircle className="mr-2" /> Your Profile
+                </Link>
 
-            {/* Mobile Menu Toggle */}
-            <button
-              className="md:hidden p-2 text-blue-100 hover:text-white rounded-full hover:bg-blue-500 dark:hover:bg-gray-700 transition-colors"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              <FaBars />
-            </button>
+                <div className="border-t dark:border-gray-700">
+                  <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                    <FaSignOutAlt className="mr-2" /> Sign out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? "max-h-96 pb-4" : "max-h-0"
-          }`}
-        >
-          <div className="flex flex-col space-y-2 mt-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  pathname.startsWith(item.href)
-                    ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400"
-                    : "text-blue-100 hover:bg-blue-500 dark:hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                <span className="mr-3">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden p-2 text-blue-100 hover:text-white rounded-full hover:bg-blue-500 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
+            <FaBars />
+          </button>
         </div>
       </div>
-    </nav>
+
+      {/* Mobile Navigation */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 pb-4" : "max-h-0"
+          }`}
+      >
+        <div className="flex flex-col space-y-2 mt-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${pathname.startsWith(item.href)
+                ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400"
+                : "text-blue-100 hover:bg-blue-500 dark:hover:bg-gray-700 hover:text-white"
+                }`}
+            >
+              <span className="mr-3">{item.icon}</span>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+    </nav >
   )
 }
