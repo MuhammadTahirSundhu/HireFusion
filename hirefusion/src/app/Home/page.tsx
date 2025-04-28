@@ -199,11 +199,11 @@ export default function HomePage() {
                   since your last visit.
                 </p>
                 <div className="mt-6 flex space-x-4 slide-in-left" style={{ animationDelay: "0.3s" }}>
-                  <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center">
+                  <button onClick={() => router.push('/home/jobs')} className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center">
                     <Search className="h-4 w-4 mr-2" />
                     Explore Jobs
                   </button>
-                  <button className="border border-purple-600 text-purple-600 hover:bg-purple-50 px-6 py-2 rounded-lg transition-all">
+                  <button onClick={() => router.push('/home/profile')} className="border border-purple-600 text-purple-600 hover:bg-purple-50 px-6 py-2 rounded-lg transition-all">
                     Update Profile
                   </button>
                 </div>
@@ -256,7 +256,7 @@ export default function HomePage() {
                 Job Opportunities
               </h2>
               <div className="flex space-x-2 slide-in-right" style={{ animationDelay: "0.5s" }}>
-                <button className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition-colors">
+                <button onClick={() => router.push('/home/jobs')} className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition-colors">
                   <Filter className="h-4 w-4" />
                   <span>Filters</span>
                 </button>

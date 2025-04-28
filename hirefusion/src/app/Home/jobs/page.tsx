@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import { Search, Bookmark, Bell, Sparkles, Sliders } from "lucide-react";
 import { JobCard, JobWithId, Job } from "@/components/job-card";
 import { JobDetails } from "@/components/job-details";
@@ -26,6 +27,7 @@ const experienceLevelOptions: string[] = ["Entry Level", "Mid Level", "Senior Le
 
 export default function JobsPage() {
   const { data: session, status } = useSession();
+  const router = useRouter(); // Initialize router
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [results, setResults] = useState<JobWithId[]>([]);
@@ -89,41 +91,32 @@ export default function JobsPage() {
     );
   };
 
-  // Toggle job bookmark status
+  // Toggle job bookmark status locally
   const toggleSaveJob = async (jobId: string): Promise<void> => {
+    if (!session?.user?.email) {
+      setError("Please sign in to save jobs");
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/savedjobs/toggle`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ jobId }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to toggle saved job");
-      }
-      const updatedSavedJobs = await response.json();
-      setSavedJobs(updatedSavedJobs.savedJobIds || []);
+      setSavedJobs((prev) =>
+        prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
+      );
     } catch (err: any) {
-      setError(err.message);
+      setError("An unexpected error occurred while saving the job");
     }
   };
 
-  // Fetch saved jobs when showSavedOnly is toggled
+  // Navigate to saved jobs page or fetch all jobs
   const toggleShowSavedOnly = async (): Promise<void> => {
-    setShowSavedOnly((prev) => !prev);
-    setCurrentPage(1); // Reset to first page
-    if (!showSavedOnly) {
-      // Fetch saved jobs
-      if (!session?.user?.email) {
-        setError("Please sign in to view saved jobs");
-        setLoading(false);
-        return;
-      }
-      await fetchSavedJobs();
-    } else {
-      // Fetch all jobs
+    if (showSavedOnly) {
+      // If currently showing saved jobs, switch to all jobs
+      setShowSavedOnly(false);
+      setCurrentPage(1); // Reset to first page
       await fetchJobs();
+    } else {
+      // Navigate to saved jobs page
+      router.push("/home/Savedjobs");
     }
   };
 
@@ -309,7 +302,7 @@ export default function JobsPage() {
               onClick={() => setActiveTab("all-jobs")}
             >
               All Jobs
-            </button>
+           </button>
             <button
               className={`py-3 px-5 text-center border-b-2 font-medium text-sm transition-all duration-300 ${
                 activeTab === "recommended"
@@ -456,8 +449,8 @@ export default function JobsPage() {
                         )}
                       </div>
 
-                      {/* Pagination Controls */}
-                      {filteredResults.length > 0 && (
+                       {/* Pagination Controls */}
+                       {filteredResults.length > 0 && (
                         <Pagination
                           currentPage={currentPage}
                           totalPages={totalPages}

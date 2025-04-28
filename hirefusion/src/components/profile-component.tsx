@@ -3,7 +3,6 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-
 interface Skill {
   name: string
 }
@@ -49,7 +48,7 @@ export default function ProfileComponent() {
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: "success" | "error" } | null>(null)
-
+ 
   useEffect(() => {
     const fetchProfile = async () => {
       if (status !== "authenticated" || !session?.user?.email) {

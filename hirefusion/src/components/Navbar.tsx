@@ -1,6 +1,9 @@
 "use client"
 import { useState, useRef, useEffect } from "react"
 import type React from "react"
+import { useSession } from "next-auth/react"
+import {  signOut } from "next-auth/react";
+
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -32,7 +35,11 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
   const { theme, setTheme } = useTheme()
+  const { data: session, status } = useSession();
 
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/signin" }); // Redirect to sign-in page after sign-out
+  };
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -192,7 +199,7 @@ export default function Navbar() {
                     <FaCog className="mr-2" /> Settings
                   </Link>
                   <div className="border-t dark:border-gray-700">
-                    <button className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                    <button onClick={handleSignOut} className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
                       <FaSignOutAlt className="mr-2" /> Sign out
                     </button>
                   </div>
