@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
         }
         user.isVerified = true;
         await user.save();
+        
         return NextResponse.json({ success: true, message: "User verified successfully" }, { status: 200 });
     } catch (error) {
         console.error("Error verifying user:", error);

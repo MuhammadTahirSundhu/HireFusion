@@ -27,6 +27,7 @@ import {
   ArrowRight,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { NextResponse } from "next/server"
 
 export default function SignupForm() {
   // Form steps
@@ -400,7 +401,7 @@ export default function SignupForm() {
         throw new Error(result.message || "Invalid OTP")
       }
       try {
-     
+
         const res = await fetch("/api/users/addprofile", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -409,16 +410,36 @@ export default function SignupForm() {
             ...profileValues          // ← skills, experience, preferences, etc.
           }),
         });
-    
+
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Error updating profile");
-    
+
         // success handling ...
       } catch (err) {
         console.error(err);
       }
-      
+
       setIsOtpVerified(true)
+      try {
+        // Call the addjob API
+        const response = await fetch('http://localhost:3000/api/recommendations/addjob', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: formValues.email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return NextResponse.json({ error: data.error || 'Failed to add job recommendations' }, { status: response.status });
+        }
+
+      } catch (error) {
+        console.error('Error triggering add job:', error);
+        return NextResponse.json({ error: 'Internal server error while jobrecommendation in update profile' }, { status: 500 });
+      }
       window.location.href = "/signin"
     } catch (error: any) {
       setOtpError(error.message)
@@ -654,13 +675,12 @@ export default function SignupForm() {
                       className={`flex flex-col items-center ${index <= currentStep ? "text-blue-800" : "text-gray-400"}`}
                     >
                       <div
-                        className={`flex items-center justify-center h-8 w-8 rounded-full mb-1 ${
-                          index < currentStep
+                        className={`flex items-center justify-center h-8 w-8 rounded-full mb-1 ${index < currentStep
                             ? "bg-blue-800 text-white"
                             : index === currentStep
                               ? "bg-white border-2 border-blue-800 text-blue-800"
                               : "bg-gray-200 text-gray-400"
-                        }`}
+                          }`}
                       >
                         {index < currentStep ? <CheckCheck className="h-4 w-4" /> : stepIcons[index]}
                       </div>
@@ -1206,9 +1226,8 @@ export default function SignupForm() {
                   type="button"
                   onClick={handlePrevStep}
                   disabled={currentStep === 0}
-                  className={`py-2 px-4 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center ${
-                    currentStep === 0 ? "text-gray-400 cursor-not-allowed" : "text-blue-700 hover:bg-blue-50"
-                  }`}
+                  className={`py-2 px-4 rounded-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center ${currentStep === 0 ? "text-gray-400 cursor-not-allowed" : "text-blue-700 hover:bg-blue-50"
+                    }`}
                   whileHover={currentStep !== 0 ? { scale: 1.05 } : {}}
                   whileTap={currentStep !== 0 ? { scale: 0.95 } : {}}
                   style={{ transition: "all 0.2s ease" }}

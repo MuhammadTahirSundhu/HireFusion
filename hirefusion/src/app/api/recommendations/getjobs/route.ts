@@ -38,7 +38,8 @@ export async function GET(request: NextRequest) {
 
     // Step 4: Fetch all matching jobs
     const jobs = await JobModel.find({ _id: { $in: jobIds } });
-
+    console.log("Recommended jobs found:", jobs.length);
+    
     return NextResponse.json(jobs, { status: 200 });
 
   } catch (error) {

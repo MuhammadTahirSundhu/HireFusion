@@ -44,6 +44,7 @@ export interface CareerChatbotProps {
   onMessageSent?: (message: Message) => void
   /** Callback when a message is received */
   onMessageReceived?: (message: Message) => void
+  
 }
 
 /**
