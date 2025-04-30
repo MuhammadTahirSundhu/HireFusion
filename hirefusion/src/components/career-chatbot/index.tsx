@@ -201,7 +201,8 @@ export default function CareerChatbot({
           })),
         }),
       })
-
+      console.log("Response:", response);
+      
       if (!response.body) throw new Error("Response body is null")
 
       const reader = response.body.getReader()

@@ -233,8 +233,8 @@ function QuizQuestion({ question, options, columns = 1, selectedOption, onSelect
             <motion.button
               key={label}
               className={`p-4 border-2 rounded-xl transition-all duration-300 ${isSelected
-                  ? "border-purple-500 bg-purple-50"
-                  : "border-gray-200 hover:border-purple-500 hover:bg-purple-50"
+                ? "border-purple-500 bg-purple-50"
+                : "border-gray-200 hover:border-purple-500 hover:bg-purple-50"
                 } ${typeof option === "object" ? "flex items-center" : ""}`}
               onClick={() => onSelect(label)}
               whileHover={{
@@ -531,7 +531,7 @@ export default function CareerAdvicePage(): JSX.Element {
   const isPathsInView = useInView(pathsRef, { once: false, amount: 0.1 })
   const skillsRef = useRef<HTMLDivElement>(null)
   const isSkillsInView = useInView(skillsRef, { once: false, amount: 0.1 })
-
+  const [showCard, setShowCard] = useState(false);
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -566,8 +566,15 @@ export default function CareerAdvicePage(): JSX.Element {
   }
 
   const handleGetRecommendations = () => {
-    console.log("Selected Career Options:", selections)
-  }
+    if (selections.experience && selections.skills && selections.goals) {
+
+      setShowCard(true);
+      // Auto-dismiss the card after 5 seconds
+      setTimeout(() => {
+        setShowCard(false);
+      }, 20000);
+    }
+  };
 
   // Debug logging to verify quiz rendering
   useEffect(() => {
@@ -900,6 +907,63 @@ export default function CareerAdvicePage(): JSX.Element {
                   Get Personalized Recommendations
                 </MicroButton>
               </div>
+              {showCard && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                  <div className="w-full max-w-md bg-white/30 backdrop-blur-lg shadow-2xl rounded-3xl p-6 border border-white/20 animate-pop-in transition-all duration-300 hover:scale-105">
+                    <div className="relative">
+                      {/* Gradient background accent */}
+
+                      {/* Content */}
+                      <div className="relative">
+                        <h3 className="text-lg font-semibold text-black mb-3">Career Advice for AI & ML</h3>
+                        <ul className="text-sm font-medium text-black space-y-2 list-disc list-inside">
+                          <li>
+                            Master <span className="font-bold text-blue-600">AI & ML fundamentals</span>: Study machine learning algorithms, neural networks, and data preprocessing to build a strong foundation.
+                          </li>
+                          <li>
+                            Gain hands-on experience: Work on real-world projects using tools like TensorFlow, PyTorch, or scikit-learn to develop practical skills.
+                          </li>
+                          <li>
+                            Stay updated: Follow AI research, attend conferences, and explore trends like generative AI and reinforcement learning to remain competitive.
+                          </li>
+                          <li>
+                            Build a portfolio: Showcase your projects on GitHub or a personal website to demonstrate expertise to employers.
+                          </li>
+                          <li>
+                            Network and learn: Join AI communities, engage in forums, and visit the{' '}
+                            <Link href="/home/resources" className="text-blue-600 font-semibold hover:text-blue-500 transition-colors">
+                              Resources Page
+                            </Link>{' '}
+                            to access courses and prepare for industry roles.
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Close button */}
+                      <button
+                        onClick={() => setShowCard(false)}
+                        className="absolute -top-3 -right-3 w-8 h-8 flex items-center justify-center bg-white/20 rounded-full text-black hover:bg-white/30 transition-all duration-200"
+                        aria-label="Close recommendation"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+
+                      {/* Animated progress bar for auto-dismiss */}
+                      <div className="mt-4 h-1 bg-black/20 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-blue-400 to-purple-400 animate-progress" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
             <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" variants={staggerContainer} initial="hidden" animate="visible">
               {[
@@ -1140,7 +1204,7 @@ export default function CareerAdvicePage(): JSX.Element {
       </section>
 
       {/* Uncomment after verifying it works */}
-      <CareerChatbot  apiEndpoint="/api/chat"  initiallyOpen={false} position="bottom-right" botName="Career Advisor" botAvatar="/images/bot-avatar.png" />
+      <CareerChatbot apiEndpoint="/api/chat" initiallyOpen={false} position="bottom-right" botName="Career Advisor" botAvatar="/images/bot-avatar.png" />
       {/* <CareerChatbot
         apiEndpoint="/api/chat"
         initiallyOpen={true}
