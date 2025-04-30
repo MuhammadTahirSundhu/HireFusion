@@ -1,10 +1,10 @@
 "use client"
 
-import type React from "react"
-import { Text } from "@react-three/drei";
+import React from "react"
+import { Text } from "@react-three/drei"
 import Image from "next/image"
 import Link from "next/link"
-import CareerChatbot from "@/components/career-chatbot"
+// import CareerChatbot from "@/components/career-chatbot" // Temporarily commented out
 import { useEffect, useRef, useState } from "react"
 import {
   Briefcase,
@@ -17,6 +17,9 @@ import {
   Star,
   TrendingUp,
   Users,
+  Building,
+  Globe,
+  UserCheck,
 } from "lucide-react"
 import { motion, useScroll, useInView, useAnimation, AnimatePresence } from "framer-motion"
 import { Canvas, useFrame } from "@react-three/fiber"
@@ -24,12 +27,31 @@ import { OrbitControls, Line } from "@react-three/drei"
 import type * as THREE from "three"
 import { Vector3 } from "three"
 import { JSX } from "react/jsx-runtime"
+import CareerChatbot from "@/components/career-chatbot"
 
-// Define types for our components
+// Error Boundary Component
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div>Something went wrong rendering this section.</div>
+    }
+    return this.props.children
+  }
+}
+
+// Define types for components
 interface QuizQuestionProps {
   question: string
   options: Array<string | QuizOption>
   columns?: number
+  selectedOption: string | null
+  onSelect: (option: string) => void
 }
 
 interface QuizOption {
@@ -77,17 +99,15 @@ const CareerPathGraph: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null)
   const nodeRefs = useRef<THREE.Mesh[]>([])
 
-  // Career path points (representing career progression)
   const pathPoints = [
-    new Vector3(-5, -2, 0), // Starting point
-    new Vector3(-3, -1, 1), // Early career
-    new Vector3(-1, 0, 0), // Mid-level
-    new Vector3(1, 1, -1), // Senior level
-    new Vector3(3, 2, 0), // Management
-    new Vector3(5, 3, 1), // Leadership
+    new Vector3(-5, -2, 0),
+    new Vector3(-3, -1, 1),
+    new Vector3(-1, 0, 0),
+    new Vector3(1, 1, -1),
+    new Vector3(3, 2, 0),
+    new Vector3(5, 3, 1),
   ]
 
-  // Career milestones/nodes
   const nodes = [
     { position: pathPoints[0], label: "Entry", color: "#c084fc" },
     { position: pathPoints[1], label: "Junior", color: "#a855f7" },
@@ -99,13 +119,9 @@ const CareerPathGraph: React.FC = () => {
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
-      // Gentle rotation of the entire graph
       groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.2) * 0.2
-
-      // Animate nodes
       nodeRefs.current.forEach((node, i) => {
         if (node) {
-          // Make nodes float up and down slightly
           node.position.y = nodes[i].position.y + Math.sin(clock.getElapsedTime() * 0.5 + i) * 0.1
         }
       })
@@ -114,10 +130,7 @@ const CareerPathGraph: React.FC = () => {
 
   return (
     <group ref={groupRef}>
-      {/* Career path line */}
       <Line points={pathPoints} color="#a855f7" lineWidth={5} dashed={false} />
-
-      {/* Career milestone nodes */}
       {nodes.map((node, index) => (
         <mesh
           key={index}
@@ -128,26 +141,16 @@ const CareerPathGraph: React.FC = () => {
         >
           <sphereGeometry args={[0.2, 16, 16]} />
           <meshStandardMaterial color={node.color} />
-
-          {/* Text label for each node */}
           <mesh position={[0, 0.4, 0]}>
             <boxGeometry args={[0.1, 0.1, 0.1]} />
             <meshStandardMaterial color={node.color} opacity={0} transparent />
           </mesh>
         </mesh>
       ))}
-
-      {/* HireFusion branding */}
       <mesh position={[0, -3, 0]}>
-        <Text
-          fontSize={0.5}
-          color="#a855f7"
-          anchorX="center"
-          anchorY="middle"
-        >
+        <Text fontSize={0.5} color="#a855f7" anchorX="center" anchorY="middle">
           HireFusion
         </Text>
-
       </mesh>
     </group>
   )
@@ -210,52 +213,51 @@ const MicroLink: React.FC<{
 }
 
 // QuizQuestion Component
-function QuizQuestion({ question, options, columns = 1 }: QuizQuestionProps): JSX.Element {
+function QuizQuestion({ question, options, columns = 1, selectedOption, onSelect }: QuizQuestionProps): JSX.Element {
   return (
     <motion.div
       className="space-y-4"
       initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      viewport={{ once: false, amount: 0.3 }}
     >
       <label className="block text-xl font-bold text-gray-800 mb-4">{question}</label>
       <div
         className={`grid grid-cols-1 ${columns === 2 ? "md:grid-cols-2" : columns === 3 ? "md:grid-cols-3" : ""} gap-4`}
       >
-        {options.map((option, index) => (
-          <motion.button
-            key={typeof option === "object" ? option.label : option}
-            className={`p-4 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 ${typeof option === "object" ? "flex items-center" : ""
-              }`}
-            whileHover={{
-              y: -5,
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-              borderColor:
-                typeof option === "object"
-                  ? option.color === "purple"
-                    ? "#a855f7"
-                    : option.color === "blue"
-                      ? "#3b82f6"
-                      : "#10b981"
-                  : "#a855f7",
-            }}
-            whileTap={{ y: 0, scale: 0.98 }}
-          >
-            {typeof option === "object" ? (
-              <>
-                <div
-                  className={`w-10 h-10 bg-${option.color}-100 rounded-lg flex items-center justify-center mr-3 shrink-0`}
-                >
-                  {option.icon}
-                </div>
-                <span className="text-gray-800 font-medium">{option.label}</span>
-              </>
-            ) : (
-              <span className="text-gray-800 font-medium">{option}</span>
-            )}
-          </motion.button>
-        ))}
+        {options.map((option, index) => {
+          const label = typeof option === "object" ? option.label : option
+          const isSelected = selectedOption === label
+
+          return (
+            <motion.button
+              key={label}
+              className={`p-4 border-2 rounded-xl transition-all duration-300 ${isSelected
+                  ? "border-purple-500 bg-purple-50"
+                  : "border-gray-200 hover:border-purple-500 hover:bg-purple-50"
+                } ${typeof option === "object" ? "flex items-center" : ""}`}
+              onClick={() => onSelect(label)}
+              whileHover={{
+                y: -5,
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+              }}
+              whileTap={{ y: 0, scale: 0.98 }}
+            >
+              {typeof option === "object" ? (
+                <>
+                  <div
+                    className={`w-10 h-10 bg-${option.color}-100 rounded-lg flex items-center justify-center mr-3 shrink-0`}
+                  >
+                    {option.icon}
+                  </div>
+                  <span className="text-gray-800 font-medium">{option.label}</span>
+                </>
+              ) : (
+                <span className="text-gray-800 font-medium">{label}</span>
+              )}
+            </motion.button>
+          )
+        })}
       </div>
     </motion.div>
   )
@@ -266,14 +268,9 @@ function CareerPathCard({ path, index }: CareerPathProps): JSX.Element {
   return (
     <motion.div
       className="bg-white rounded-3xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-500"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { delay: index * 0.1, duration: 0.5 },
-        },
-      }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
       whileHover={{
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
         y: -10,
@@ -318,19 +315,13 @@ function CourseCard({ course, index }: CourseCardProps): JSX.Element {
   return (
     <motion.div
       className="bg-white rounded-3xl shadow-lg overflow-hidden"
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { delay: index * 0.1, duration: 0.5 },
-        },
-      }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
       whileHover={{
         y: -10,
         boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
       }}
-      transition={{ duration: 0.3 }}
     >
       <div className="h-56 bg-gradient-to-br from-gray-900 to-gray-700 relative overflow-hidden">
         <Image
@@ -354,7 +345,9 @@ function CourseCard({ course, index }: CourseCardProps): JSX.Element {
       </div>
       <div className="p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-3">{course.title}</h3>
-        <p className="text-gray-600 mb-4">{course.description}</p>
+        <p className="text-gray-600 mb-4">{course
+
+          .description}</p>
         <div className="flex items-center text-gray-500 mb-4">
           <Clock className="h-4 w-4 mr-1" />
           <span className="text-sm">{course.duration}</span>
@@ -384,21 +377,21 @@ function TestimonialsSlider(): JSX.Element {
       name: "Sarah Johnson",
       role: "UX/UI Designer",
       image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1974&auto=format&fit=crop",
-      text: "I started as a part-time freelancer with basic design skills. After taking courses and building my portfolio on HireFusion, I now run my own design agency with clients worldwide. The platform's resources and community support were instrumental in my growth.",
+      text: "I started as a part-time freelancer with basic design skills. After taking courses and building my portfolio on HireFusion, I now run my own design agency with clients worldwide.",
       tags: ["UX Design", "Agency Growth", "Portfolio Building"],
     },
     {
       name: "Michael Chen",
       role: "Full-Stack Developer",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-      text: "After being laid off, I turned to HireFusion as a temporary solution. The career resources helped me identify my strengths and position myself effectively. Now I earn twice my previous salary working with clients I love.",
+      text: "After being laid off, I turned to HireFusion as a temporary solution. The career resources helped me identify my strengths and now I earn twice my previous salary.",
       tags: ["Web Development", "Career Transition", "Client Acquisition"],
     },
     {
       name: "Jessica Williams",
       role: "Content Strategist",
       image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop",
-      text: "The templates and proposal guides on HireFusion were game-changers for me. I went from struggling to find clients to having a waitlist within 6 months. The structured approach to freelancing made all the difference.",
+      text: "The templates and proposal guides on HireFusion were game-changers. I went from struggling to find clients to having a waitlist within 6 months.",
       tags: ["Content Strategy", "Client Management", "Pricing Strategy"],
     },
   ]
@@ -407,7 +400,6 @@ function TestimonialsSlider(): JSX.Element {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length)
     }, 8000)
-
     return () => clearInterval(interval)
   }, [testimonials.length])
 
@@ -435,21 +427,17 @@ function TestimonialsSlider(): JSX.Element {
               </div>
               <h3 className="text-xl font-bold">{testimonials[currentIndex].name}</h3>
               <p className="text-gray-400">{testimonials[currentIndex].role}</p>
-
               <div className="flex mt-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star key={star} className="h-5 w-5 text-yellow-500 fill-current" />
                 ))}
               </div>
             </div>
-
             <div className="md:w-3/4">
               <svg className="h-12 w-12 text-purple-700 opacity-30 mb-4" fill="currentColor" viewBox="0 0 32 32">
                 <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
               </svg>
-
               <p className="text-xl leading-relaxed mb-6">{testimonials[currentIndex].text}</p>
-
               <div className="flex flex-wrap gap-2">
                 {testimonials[currentIndex].tags.map((tag) => (
                   <span key={tag} className="px-3 py-1 bg-gray-800 text-gray-200 rounded-full text-sm">
@@ -461,14 +449,12 @@ function TestimonialsSlider(): JSX.Element {
           </div>
         </motion.div>
       </AnimatePresence>
-
       <div className="flex justify-center mt-8 space-x-2">
         {testimonials.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-purple-600" : "bg-gray-700"
-              } transition-colors duration-300`}
+            className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-purple-600" : "bg-gray-700"} transition-colors duration-300`}
             aria-label={`Go to testimonial ${index + 1}`}
           />
         ))}
@@ -485,9 +471,8 @@ function FaqItem({ question, answer }: FaqItemProps): JSX.Element {
     <motion.div
       className="border-b border-gray-200 pb-4"
       initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      viewport={{ once: false, amount: 0.8 }}
     >
       <button
         className="flex justify-between items-center w-full py-4 text-left"
@@ -503,7 +488,6 @@ function FaqItem({ question, answer }: FaqItemProps): JSX.Element {
           className={`h-5 w-5 text-purple-600 transform transition-transform duration-300 ${isOpen ? "rotate-90" : ""}`}
         />
       </button>
-
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -523,31 +507,31 @@ function FaqItem({ question, answer }: FaqItemProps): JSX.Element {
 }
 
 export default function CareerAdvicePage(): JSX.Element {
-  // For gradient animation
   const [gradientPosition, setGradientPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
+  const [selections, setSelections] = useState<{
+    experience?: string
+    skills?: string
+    goals?: string
+    environment?: string
+    industry?: string
+    leadership?: string
+  }>({})
 
-  // For parallax effect
   const handleMouseMove = (e: React.MouseEvent): void => {
     const x = e.clientX / window.innerWidth
     const y = e.clientY / window.innerHeight
     setGradientPosition({ x, y })
   }
 
-  // For scroll animations
   const controls = useAnimation()
   const { scrollYProgress } = useScroll()
-
-  // Refs for sections to detect when they're in view
   const introRef = useRef<HTMLDivElement>(null)
-  const isIntroInView = useInView(introRef, { once: false, amount: 0.3 })
-
+  const isIntroInView = useInView(introRef, { once: false, amount: 0.1 })
   const pathsRef = useRef<HTMLDivElement>(null)
-  const isPathsInView = useInView(pathsRef, { once: false, amount: 0.3 })
-
+  const isPathsInView = useInView(pathsRef, { once: false, amount: 0.1 })
   const skillsRef = useRef<HTMLDivElement>(null)
-  const isSkillsInView = useInView(skillsRef, { once: false, amount: 0.3 })
+  const isSkillsInView = useInView(skillsRef, { once: false, amount: 0.1 })
 
-  // Animation variants
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -563,12 +547,6 @@ export default function CareerAdvicePage(): JSX.Element {
     },
   }
 
-  const cardVariant = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
-
-  // Real images for the page
   const images = {
     hero: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop",
     intro: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop",
@@ -580,9 +558,25 @@ export default function CareerAdvicePage(): JSX.Element {
     profile3: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop",
   }
 
+  const handleSelect = (category: string, option: string) => {
+    setSelections((prev) => ({
+      ...prev,
+      [category]: option,
+    }))
+  }
+
+  const handleGetRecommendations = () => {
+    console.log("Selected Career Options:", selections)
+  }
+
+  // Debug logging to verify quiz rendering
+  useEffect(() => {
+    console.log("Quiz section rendering, selections:", selections)
+  }, [selections])
+
   return (
     <div className="min-h-screen bg-slate-50 overflow-hidden">
-      {/* Header - Interactive Gradient with 3D Elements */}
+      {/* Header */}
       <header
         className="relative h-screen flex items-center justify-center overflow-hidden"
         onMouseMove={handleMouseMove}
@@ -599,11 +593,9 @@ export default function CareerAdvicePage(): JSX.Element {
             style={{ backgroundImage: `url(${images.hero})` }}
           ></div>
         </div>
-
         <div className="absolute inset-0 z-10 opacity-70">
           <Scene3D />
         </div>
-
         <motion.div
           className="relative z-20 max-w-7xl mx-auto px-6 text-center"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -621,7 +613,6 @@ export default function CareerAdvicePage(): JSX.Element {
               Career Pathway Hub
             </span>
           </motion.h1>
-
           <motion.p
             className="text-xl md:text-2xl max-w-3xl mx-auto text-white text-opacity-90 mb-8"
             initial={{ y: 30, opacity: 0 }}
@@ -631,7 +622,6 @@ export default function CareerAdvicePage(): JSX.Element {
             Whether you're just starting out or looking to level up, our expert advice, resources, and tools will help
             you navigate your career journey with confidence.
           </motion.p>
-
           <motion.div
             className="flex flex-wrap justify-center gap-4"
             initial={{ y: 40, opacity: 0 }}
@@ -639,17 +629,16 @@ export default function CareerAdvicePage(): JSX.Element {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             <Link href="#explore">
-              <MicroButton className="px-8 py-4 bg-white text-purple-700 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform transition-all duration-300">
+              <MicroButton className="px-8 py-4 bg-white text-purple-700 rounded-full font-bold text-lg shadow-lg hover:shadow-xl">
                 Start Your Journey
               </MicroButton>
             </Link>
             <Link href="#resources">
-              <MicroButton className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-bold text-lg hover:bg-white hover:bg-opacity-10 transform transition-all duration-300">
+              <MicroButton className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-bold text-lg hover:bg-white hover:bg-opacity-10">
                 Explore Resources
               </MicroButton>
             </Link>
           </motion.div>
-
           <motion.div
             className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
             initial={{ y: 10, opacity: 0 }}
@@ -699,7 +688,6 @@ export default function CareerAdvicePage(): JSX.Element {
                 Get expert advice, resources, and actionable steps that will help you succeed in your career, no matter
                 where you are starting from.
               </p>
-
               <motion.div
                 className="flex flex-wrap gap-3 mb-8"
                 variants={staggerContainer}
@@ -715,19 +703,17 @@ export default function CareerAdvicePage(): JSX.Element {
                         })`,
                       color: "white",
                     }}
-                    variants={cardVariant}
+                    variants={fadeIn}
                     whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
                   >
                     {level}
                   </motion.span>
                 ))}
               </motion.div>
-
-              <MicroButton className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-lg shadow-lg flex items-center transform transition-all duration-300">
+              <MicroButton className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-lg shadow-lg flex items-center">
                 Explore Resources <ChevronRight className="ml-2 h-5 w-5" />
               </MicroButton>
             </motion.div>
-
             <motion.div
               className="lg:w-1/2"
               variants={fadeIn}
@@ -767,112 +753,178 @@ export default function CareerAdvicePage(): JSX.Element {
       </section>
 
       {/* Personalized Career Paths */}
-      <section id="explore" className="py-24 px-6 bg-gradient-to-b from-white to-indigo-50" ref={pathsRef}>
-        <motion.div
-          className="max-w-7xl mx-auto"
-          initial="hidden"
-          animate={isPathsInView ? "visible" : "hidden"}
-          variants={fadeIn}
+      <ErrorBoundary>
+        <section
+          id="explore"
+          className="py-24 px-6 bg-gradient-to-b from-white to-indigo-50 min-h-[500px]"
+          ref={pathsRef}
         >
-          <motion.div className="text-center mb-16" variants={fadeIn}>
-            <motion.span
-              className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium inline-block mb-4"
-              initial={{ opacity: 0, y: -20 }}
+          <motion.div
+            className="max-w-7xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div className="text-center mb-16">
+              <motion.span
+                className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium inline-block mb-4"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                FIND YOUR PATH
+              </motion.span>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                Discover the Path That's Right for You
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Take our quick career assessment to find out where you can go next. Based on your skills, goals, and
+                interests, we'll guide you to the best career paths on HireFusion.
+              </p>
+            </motion.div>
+            <motion.div
+              className="bg-white rounded-3xl shadow-xl overflow-hidden mb-16"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              FIND YOUR PATH
-            </motion.span>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-              Discover the Path That's Right for You
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Take our quick career assessment to find out where you can go next. Based on your skills, goals, and
-              interests, we'll guide you to the best career paths on HireFusion.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="bg-white rounded-3xl shadow-xl overflow-hidden mb-16"
-            variants={fadeIn}
-            whileHover={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
-          >
-            <div className="p-8 md:p-12">
-              <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
-                  <Lightbulb className="h-6 w-6 text-purple-600" />
+              <div className="p-8 md:p-12">
+                <div className="flex items-center mb-8">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4">
+                    <Lightbulb className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-800">Career Assessment Quiz</h3>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-800">Career Assessment Quiz</h3>
+                <div className="space-y-8">
+                  <QuizQuestion
+                    question="What's your current experience level?"
+                    options={["Beginner (0-2 years)", "Intermediate (3-5 years)", "Expert (6+ years)"]}
+                    selectedOption={selections.experience || null}
+                    onSelect={(option) => handleSelect("experience", option)}
+                  />
+                  <QuizQuestion
+                    question="Which skills are you most interested in developing?"
+                    options={[
+                      {
+                        icon: <FileText className="h-5 w-5 text-purple-600" />,
+                        label: "Content Writing",
+                        color: "purple",
+                      },
+                      {
+                        icon: <Briefcase className="h-5 w-5 text-blue-600" />,
+                        label: "Business Strategy",
+                        color: "blue",
+                      },
+                      {
+                        icon: <TrendingUp className="h-5 w-5 text-green-600" />,
+                        label: "Digital Marketing",
+                        color: "green",
+                      },
+                      {
+                        icon: <GraduationCap className="h-5 w-5 text-indigo-600" />,
+                        label: "Software Development",
+                        color: "indigo",
+                      },
+                    ]}
+                    selectedOption={selections.skills || null}
+                    onSelect={(option) => handleSelect("skills", option)}
+                  />
+                  <QuizQuestion
+                    question="What are your career goals?"
+                    options={[
+                      "Become a full-time professional",
+                      "Supplement my income with part-time work",
+                      "Build a business or agency",
+                      "Develop new skills for my current job",
+                    ]}
+                    columns={2}
+                    selectedOption={selections.goals || null}
+                    onSelect={(option) => handleSelect("goals", option)}
+                  />
+                  <QuizQuestion
+                    question="What work environment do you prefer?"
+                    options={[
+                      {
+                        icon: <Building className="h-5 w-5 text-purple-600" />,
+                        label: "Corporate Office",
+                        color: "purple",
+                      },
+                      {
+                        icon: <Globe className="h-5 w-5 text-blue-600" />,
+                        label: "Remote Work",
+                        color: "blue",
+                      },
+                      {
+                        icon: <Users className="h-5 w-5 text-green-600" />,
+                        label: "Hybrid",
+                        color: "green",
+                      },
+                    ]}
+                    selectedOption={selections.environment || null}
+                    onSelect={(option) => handleSelect("environment", option)}
+                  />
+                  <QuizQuestion
+                    question="Which industry interests you most?"
+                    options={["Technology", "Healthcare", "Finance", "Education", "Creative Arts"]}
+                    columns={2}
+                    selectedOption={selections.industry || null}
+                    onSelect={(option) => handleSelect("industry", option)}
+                  />
+                  <QuizQuestion
+                    question="What leadership style suits you?"
+                    options={[
+                      {
+                        icon: <UserCheck className="h-5 w-5 text-indigo-600" />,
+                        label: "Collaborative Leader",
+                        color: "indigo",
+                      },
+                      {
+                        icon: <Star className="h-5 w-5 text-purple-600" />,
+                        label: "Independent Contributor",
+                        color: "purple",
+                      },
+                      {
+                        icon: <TrendingUp className="h-5 w-5 text-green-600" />,
+                        label: "Visionary Entrepreneur",
+                        color: "green",
+                      },
+                    ]}
+                    selectedOption={selections.leadership || null}
+                    onSelect={(option) => handleSelect("leadership", option)}
+                  />
+                </div>
+                <MicroButton
+                  onClick={handleGetRecommendations}
+                  className="mt-10 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-lg shadow-lg flex items-center justify-center mx-auto"
+                >
+                  Get Personalized Recommendations
+                </MicroButton>
               </div>
-
-              <div className="space-y-8">
-                <QuizQuestion
-                  question="What's your current experience level?"
-                  options={["Beginner (0-2 years)", "Intermediate (3-5 years)", "Expert (6+ years)"]}
-                />
-
-                <QuizQuestion
-                  question="Which skills are you most interested in developing?"
-                  options={[
-                    {
-                      icon: <FileText className="h-5 w-5 text-purple-600" />,
-                      label: "Content Writing",
-                      color: "purple",
-                    },
-                    {
-                      icon: <Briefcase className="h-5 w-5 text-blue-600" />,
-                      label: "Business Strategy",
-                      color: "blue",
-                    },
-                    {
-                      icon: <TrendingUp className="h-5 w-5 text-green-600" />,
-                      label: "Digital Marketing",
-                      color: "green",
-                    },
-                  ]}
-                />
-
-                <QuizQuestion
-                  question="What are your career goals?"
-                  options={[
-                    "Become a full-time professional",
-                    "Supplement my income with part-time work",
-                    "Build a business or agency",
-                    "Develop new skills for my current job",
-                  ]}
-                  columns={2}
-                />
-              </div>
-
-              <MicroButton className="mt-10 px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-lg shadow-lg flex items-center justify-center mx-auto">
-                Get Personalized Recommendations
-              </MicroButton>
-            </div>
+            </motion.div>
+            <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" variants={staggerContainer} initial="hidden" animate="visible">
+              {[
+                {
+                  icon: <GraduationCap className="h-6 w-6 text-purple-600" />,
+                  title: "Design Career Path",
+                  color: "purple",
+                },
+                {
+                  icon: <Briefcase className="h-6 w-6 text-blue-600" />,
+                  title: "Development Career Path",
+                  color: "blue",
+                },
+                {
+                  icon: <TrendingUp className="h-6 w-6 text-green-600" />,
+                  title: "Marketing Career Path",
+                  color: "green",
+                },
+              ].map((path, index) => (
+                <CareerPathCard key={path.title} path={path} index={index} />
+              ))}
+            </motion.div>
           </motion.div>
-
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8" variants={staggerContainer}>
-            {[
-              {
-                icon: <GraduationCap className="h-6 w-6 text-purple-600" />,
-                title: "Design Career Path",
-                color: "purple",
-              },
-              {
-                icon: <Briefcase className="h-6 w-6 text-blue-600" />,
-                title: "Development Career Path",
-                color: "blue",
-              },
-              {
-                icon: <TrendingUp className="h-6 w-6 text-green-600" />,
-                title: "Marketing Career Path",
-                color: "green",
-              },
-            ].map((path, index) => (
-              <CareerPathCard key={path.title} path={path} index={index} />
-            ))}
-          </motion.div>
-        </motion.div>
-      </section>
+        </section>
+      </ErrorBoundary>
 
       {/* Skill Development Tips */}
       <section id="resources" className="py-24 px-6" ref={skillsRef}>
@@ -897,7 +949,6 @@ export default function CareerAdvicePage(): JSX.Element {
               the top skills employers are looking for on HireFusion.
             </p>
           </motion.div>
-
           <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" variants={staggerContainer}>
             {[
               {
@@ -930,7 +981,6 @@ export default function CareerAdvicePage(): JSX.Element {
               <CourseCard key={course.title} course={course} index={index} />
             ))}
           </motion.div>
-
           <motion.div className="mt-16 text-center" variants={fadeIn}>
             <MicroButton className="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-lg shadow-lg flex items-center mx-auto">
               Browse All Courses <ChevronRight className="ml-2 h-5 w-5" />
@@ -945,16 +995,14 @@ export default function CareerAdvicePage(): JSX.Element {
           <motion.div
             className="text-center mb-16"
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            viewport={{ once: false, amount: 0.3 }}
           >
             <motion.span
               className="px-4 py-2 bg-purple-900 text-purple-200 rounded-full text-sm font-medium inline-block mb-4"
               initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: false, amount: 0.3 }}
             >
               SUCCESS STORIES
             </motion.span>
@@ -964,7 +1012,6 @@ export default function CareerAdvicePage(): JSX.Element {
               goals.
             </p>
           </motion.div>
-
           <TestimonialsSlider />
         </div>
       </section>
@@ -973,15 +1020,12 @@ export default function CareerAdvicePage(): JSX.Element {
       <section className="py-24 px-6 bg-indigo-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* FAQ Section */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              viewport={{ once: false, amount: 0.3 }}
             >
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-8">Frequently Asked Questions</h2>
-
               <div className="space-y-6">
                 <FaqItem
                   question="How do I find my first job on HireFusion?"
@@ -993,14 +1037,13 @@ export default function CareerAdvicePage(): JSX.Element {
                 />
                 <FaqItem
                   question="How do I stand out from other candidates?"
-                  answer="Customize your application for each job, highlight relevant experience, create a compelling portfolio that showcases your best work, and demonstrate your understanding of the company's needs in your cover letter."
+                  answer="Customize your application for each job, highlight relevant experience, create a compelling portfolio that showcases your best work, and demonstrate your understanding of the company's needs."
                 />
                 <FaqItem
                   question="How do I prepare for interviews through HireFusion?"
-                  answer="Research the company thoroughly, practice common interview questions in your field, prepare examples of your past work, and use our Interview Prep feature that provides industry-specific guidance and mock interviews."
+                  answer="Research the company thoroughly, practice common interview questions in your field, prepare examples of your past work, and use our Interview Prep feature that provides industry-specific guidance."
                 />
               </div>
-
               <motion.button
                 className="mt-8 text-purple-600 font-bold flex items-center"
                 whileHover={{ x: 5 }}
@@ -1009,21 +1052,16 @@ export default function CareerAdvicePage(): JSX.Element {
                 View all FAQs <ChevronRight className="ml-1 h-5 w-5" />
               </motion.button>
             </motion.div>
-
-            {/* Newsletter Section */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              viewport={{ once: false, amount: 0.3 }}
             >
               <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Join Our Newsletter</h2>
                 <p className="text-xl text-gray-600 mb-8">
-                  Get weekly tips, job opportunities, and industry insights delivered straight to your inbox. Stay
-                  informed and ahead of the curve with HireFusion.
+                  Get weekly tips, job opportunities, and industry insights delivered straight to your inbox.
                 </p>
-
                 <div className="relative">
                   <input
                     type="email"
@@ -1034,7 +1072,6 @@ export default function CareerAdvicePage(): JSX.Element {
                     Subscribe
                   </MicroButton>
                 </div>
-
                 <div className="mt-8 flex items-center gap-3">
                   <div className="flex -space-x-2">
                     {[1, 2, 3, 4].map((i) => (
@@ -1046,7 +1083,6 @@ export default function CareerAdvicePage(): JSX.Element {
                   </p>
                 </div>
               </div>
-
               <motion.div
                 className="mt-12 p-8 bg-gradient-to-r from-purple-700 to-indigo-700 rounded-3xl shadow-xl text-white"
                 whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }}
@@ -1076,26 +1112,22 @@ export default function CareerAdvicePage(): JSX.Element {
         <motion.div
           className="max-w-4xl mx-auto text-center"
           initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          viewport={{ once: false, amount: 0.3 }}
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Start Building Your Future Today</h2>
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
             You've got the tools, now it's time to act. Use HireFusion's resources, set your goals, and start your
             career journey with confidence!
           </p>
-
           <MicroButton className="px-10 py-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-bold text-xl shadow-xl inline-flex items-center">
             Begin Your Journey <ChevronRight className="ml-2 h-6 w-6" />
           </MicroButton>
-
           <motion.div
             className="mt-16 flex flex-wrap justify-center gap-6"
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            viewport={{ once: false, amount: 0.3 }}
           >
             {["5,000+ Success Stories", "24/7 Support", "Free Resources", "Expert Guidance"].map((item) => (
               <div key={item} className="flex items-center gap-2">
@@ -1106,11 +1138,22 @@ export default function CareerAdvicePage(): JSX.Element {
           </motion.div>
         </motion.div>
       </section>
-      <CareerChatbot 
+
+      {/* Uncomment after verifying it works */}
+      <CareerChatbot  apiEndpoint="/api/chat"  initiallyOpen={false} position="bottom-right" botName="Career Advisor" botAvatar="/images/bot-avatar.png" />
+      {/* <CareerChatbot
         apiEndpoint="/api/chat"
+        initiallyOpen={true}
+        position="bottom-right"
         botName="Career Advisor"
         botAvatar="/images/bot-avatar.png"
-      />
+        initialMessages={[
+          { id: "1", content: "Welcome! How can I assist you with your career today?", role: "user" },
+        ]}
+        initialMuted={true}
+        onMessageSent={(message) => console.log("Sent:", message)}
+        onMessageReceived={(message) => console.log("Received:", message)}
+      /> */}
       {/* Footer */}
       <footer className="py-16 px-6 bg-gray-950 text-white">
         <div className="max-w-7xl mx-auto">
@@ -1131,7 +1174,6 @@ export default function CareerAdvicePage(): JSX.Element {
                 ))}
               </div>
             </div>
-
             <div>
               <h4 className="text-lg font-bold mb-6">Resources</h4>
               <ul className="space-y-4">
@@ -1144,7 +1186,6 @@ export default function CareerAdvicePage(): JSX.Element {
                 ))}
               </ul>
             </div>
-
             <div>
               <h4 className="text-lg font-bold mb-6">Career Paths</h4>
               <ul className="space-y-4">
@@ -1157,7 +1198,6 @@ export default function CareerAdvicePage(): JSX.Element {
                 ))}
               </ul>
             </div>
-
             <div>
               <h4 className="text-lg font-bold mb-6">Company</h4>
               <ul className="space-y-4">
@@ -1171,7 +1211,6 @@ export default function CareerAdvicePage(): JSX.Element {
               </ul>
             </div>
           </div>
-
           <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0">© {new Date().getFullYear()} HireFusion. All rights reserved.</p>
             <div className="flex space-x-6">
