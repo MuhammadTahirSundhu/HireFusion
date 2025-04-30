@@ -1,56 +1,110 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
 
 // LLaMA API endpoint
-const LLAMA_API_URL = "http://localhost:11434/api/chat"
+const LLAMA_API_URL = "http://localhost:11434/api/chat";
 
-// Define a static fallback response in case the API fails
+// Define a static fallback response with career advice
 const STATIC_RESPONSE = {
-  role: "system",
-  content: "Sorry, there seems to be an issue with the service. Here's a static response: Please try again later."
-}
+  role: "assistant",
+  content: "Explore new skills and network actively to boost your career growth.",
+};
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    const { messages }: { messages: { role: string; content: string }[] } = await req.json()
+    const { messages }: { messages: { role: string; content: string }[] } = await req.json();
+    console.log("Received messages:", messages);
 
     // Add a system message instructing the model to give concise answers
     const enhancedMessages = [
       { role: "system", content: "Please provide concise and to-the-point answers in maximum 100 characters." },
       ...messages,
-    ]
+    ];
 
-    const llamaRes = await fetch(LLAMA_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "llama3.2", // Change to your model name if different
-        messages: enhancedMessages,
-        stream: true,
-      }),
-    })
+    console.log("Sending request to LLaMA API:", LLAMA_API_URL);
+    let llamaRes;
+    try {
+      llamaRes = await fetch(LLAMA_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama3.2",
+          messages: enhancedMessages,
+          stream: true,
+        }),
+      });
+    } catch (fetchError: any) {
+      // Handle fetch-specific errors like ECONNREFUSED
+      if (fetchError.cause?.code === "ECONNREFUSED") {
+        console.log("LLaMA server unavailable (ECONNREFUSED). Returning static response.");
+        const stream = new ReadableStream({
+          start(controller) {
+            const responseChunk = {
+              message: STATIC_RESPONSE,
+              done: false,
+            };
+            const encodedChunk = `data: ${JSON.stringify(responseChunk)}\n\n`;
+            controller.enqueue(new TextEncoder().encode(encodedChunk));
 
-    if (!llamaRes.ok || !llamaRes.body) {
-      // Check if the server is down or something went wrong
-      throw new Error("Failed to connect to LLaMA server.")
+            const doneChunk = `data: {"done": true}\n\n`;
+            controller.enqueue(new TextEncoder().encode(doneChunk));
+
+            controller.close();
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        });
+      }
+      throw fetchError; // Re-throw other fetch errors
     }
 
-    // Proxy the response as-is
+    if (!llamaRes.ok || !llamaRes.body) {
+      console.log(`LLaMA server returned status: ${llamaRes.status}. Returning static response.`);
+      const stream = new ReadableStream({
+        start(controller) {
+          const responseChunk = {
+            message: STATIC_RESPONSE,
+            done: false,
+          };
+          const encodedChunk = `data: ${JSON.stringify(responseChunk)}\n\n`;
+          controller.enqueue(new TextEncoder().encode(encodedChunk));
+
+          const doneChunk = `data: {"done": true}\n\n`;
+          controller.enqueue(new TextEncoder().encode(doneChunk));
+
+          controller.close();
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
+    }
+
+    console.log("LLaMA response received, proxying stream.");
     return new Response(llamaRes.body, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
-    })
+    });
   } catch (error) {
-    console.error("Error in chat API:", error)
-
-    // Return static fallback response if API fails
+    console.error("Unexpected error in chat API:", error);
     return NextResponse.json(
-      { error: "Service unavailable. Here's a static response.", fallbackResponse: STATIC_RESPONSE },
+      { error: "Service unavailable. Unexpected error occurred." },
       { status: 500 }
-    )
+    );
   }
 }
