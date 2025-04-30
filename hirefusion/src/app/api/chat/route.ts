@@ -33,12 +33,8 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     if (!llamaRes.ok || !llamaRes.body) {
       // Check if the server is down or something went wrong
-      
-      return NextResponse.json(
-        { error: "Service unavailable. Here's a static response.", fallbackResponse: STATIC_RESPONSE },
-        { status: 500 }
-      )
-        }
+      throw new Error("Failed to connect to LLaMA server.")
+    }
 
     // Proxy the response as-is
     return new Response(llamaRes.body, {
