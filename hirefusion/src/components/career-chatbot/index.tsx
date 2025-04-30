@@ -44,6 +44,7 @@ export interface CareerChatbotProps {
   onMessageSent?: (message: Message) => void
   /** Callback when a message is received */
   onMessageReceived?: (message: Message) => void
+  
 }
 
 /**
@@ -187,72 +188,6 @@ export default function CareerChatbot({
       onMessageSent(userMessage)
     }
 
-    // Static career advice response
-    const staticResponse = {
-      message: {
-        content: "To advance your career, focus on continuous learning and networking. Upskill through online courses or certifications relevant to your field, and attend industry events to connect with professionals. Tailor your resume to highlight measurable achievements, and practice for interviews to confidently articulate your value. Stay proactive and open to new opportunities!",
-      },
-      done: true,
-    }
-
-    try {
-      // Simulate streaming effect
-      let accumulatedContent = ""
-      const simulateStream = async () => {
-        accumulatedContent = staticResponse.message.content
-
-        // Play typing sound
-        if (soundsLoaded && initialized) {
-          playSound("typing")
-        }
-
-        // Update the assistant message with the accumulated content
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantMessage.id ? { ...m, content: accumulatedContent } : m
-          )
-        )
-
-        // Simulate delay for streaming effect
-        await new Promise((resolve) => setTimeout(resolve, 500))
-
-        // Play message received sound when complete
-        if (soundsLoaded && initialized) {
-          playSound("messageReceived")
-        }
-
-        // Mark the message as complete
-        const completedMessage = { ...assistantMessage, content: accumulatedContent, complete: true }
-        setMessages((prev) => prev.map((m) => (m.id === assistantMessage.id ? completedMessage : m)))
-
-        // Call onMessageReceived callback if provided
-        if (onMessageReceived) {
-          onMessageReceived(completedMessage)
-        }
-      }
-
-      await simulateStream()
-    } catch (error) {
-      console.error("Error processing static response:", error)
-      // Update the assistant message with an error
-      const errorMessage = {
-        ...assistantMessage,
-        content: "Sorry, there was an error processing your request.",
-        complete: true,
-      }
-
-      setMessages((prev) => prev.map((m) => (m.id === assistantMessage.id ? errorMessage : m)))
-
-      // Call onMessageReceived callback with error message if provided
-      if (onMessageReceived) {
-        onMessageReceived(errorMessage)
-      }
-    } finally {
-      setIsStreaming(false)
-    }
-
-    // Commented out original API logic
-    /*
     try {
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -344,8 +279,9 @@ export default function CareerChatbot({
       if (onMessageReceived) {
         onMessageReceived(errorMessage)
       }
+    } finally {
+      setIsStreaming(false)
     }
-    */
   }
 
   const toggleChat = () => {
