@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { Bell, BellOff, Edit, Trash2, Plus, X, AlertTriangle } from "lucide-react"
+import { getSession, useSession } from "next-auth/react"
 
 export interface JobAlert {
   id: string
@@ -25,6 +26,7 @@ export function JobAlerts({ jobOptions }: JobAlertsProps) {
   const [showModal, setShowModal] = useState(false)
   const [hasNewAlerts, setHasNewAlerts] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     const savedAlerts = localStorage.getItem("jobAlerts")
@@ -38,11 +40,12 @@ export function JobAlerts({ jobOptions }: JobAlertsProps) {
   }, [jobAlerts])
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       if (jobAlerts.length > 0 && Math.random() > 0.7) {
-        setHasNewAlerts(true)
+        setHasNewAlerts(true);
+
       }
-    }, 30000)
+    }, 30000);
     return () => clearInterval(interval)
   }, [jobAlerts])
 
@@ -53,7 +56,7 @@ export function JobAlerts({ jobOptions }: JobAlertsProps) {
     setFormError(null)
   }
 
-  const handleCreateJobAlert = () => {
+  const handleCreateJobAlert = async () => {
     if (!newAlertName.trim() || !jobTitle.trim()) {
       setFormError("Please enter both an alert name and job title")
       return
@@ -67,6 +70,81 @@ export function JobAlerts({ jobOptions }: JobAlertsProps) {
       active: true,
       createdAt: Date.now(),
     }
+    async function sendJobAlert() {
+      try {
+        const response = await fetch("/api/jobAlert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            // to: session?.user?.email,
+            // to: "i212493@nu.edu.pk",
+            // to: "Daniyal09shaikh@gmail.com",
+            to: "i220281@nu.edu.pk",
+            subject: `New Opportunity: ${newJobAlert.jobTitle} Job Posting`,
+            message: `
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                  body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+                  .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; }
+                  .header { background-color: #007bff; color: white; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
+                  .content { padding: 20px; background-color: white; border-radius: 0 0 8px 8px; }
+                  .button { display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                  .button:hover { background-color: #0056b3; }
+                  .footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }
+                  @media only screen and (max-width: 600px) {
+                    .container { margin: 10px; padding: 10px; }
+                    .button { width: 100%; text-align: center; }
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1 style="margin: 0; font-size: 24px;">${alert.name}</h1>
+                  </div>
+                  <div class="content">
+                    <h2 style="color: #007bff;">New ${newJobAlert.jobTitle} Opportunity</h2>
+                    <p>Dear Job Seeker,</p>
+                    <p>We’re excited to inform you about a new <strong>${newJobAlert.jobTitle}</strong> position that matches your interests! This is a great opportunity to take the next step in your career.</p>
+                    <p>Explore the details of this role and apply today to seize this opportunity.</p>
+                    <p style="text-align: center;">
+                      <a href="https://general-ollama-ai-chatbot.vercel.app/" class="button">Visit Job Listing</a>
+                    </p>
+                    <p>Thank you for choosing HireFusion to advance your career.</p>
+                    <p>Best regards,<br>HireFusion Job Alert Team</p>
+                  </div>
+                  <div class="footer">
+                    <p>This is an automated notification. Please do not reply directly to this email.</p>
+                    <p>© ${new Date().getFullYear()} HireFusion. All rights reserved.</p>
+                  </div>
+                </div>
+              </body>
+              </html>
+            `,
+          }),
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error(`Error sending job alert:`, errorData.message || response.statusText);
+        } else {
+          console.log(`Job alert sent successfully`);
+        }
+      } catch (error) {
+        console.error(`Error sending job alert:`, error);
+      }
+    }
+    
+    try {
+      await sendJobAlert();
+    } catch (error) {
+      console.error("Error in sendJobAlert:", error);
+    }
+      
 
     setJobAlerts((prev) => [...prev, newJobAlert])
     resetForm()
