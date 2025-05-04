@@ -301,7 +301,7 @@ export default function Homepage() {
                     <div className="h-3 w-3 rounded-full bg-yellow-500 mr-2"></div>
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
                   </div>
-                  <div className="text-sm text-purple-300">JobHub Platform</div>
+                  <div className="text-sm text-purple-300">HireFusion Platform</div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1010,7 +1010,7 @@ export default function Homepage() {
                   <span className="font-bold text-white">JH</span>
                 </div>
                 <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-200">
-                  JobHub
+                  HireFusion
                 </span>
               </Link>
               <p className="text-gray-400 mb-4">
@@ -1178,7 +1178,7 @@ export default function Homepage() {
           </div>
 
           <div className="mt-12 pt-8 border-t border-purple-900/30 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} JobHub. All rights reserved.</p>
+            <p className="text-gray-500 text-sm">&copy; {new Date().getFullYear()} HireFusion. All rights reserved.</p>
             <div className="mt-4 md:mt-0 flex space-x-6">
               <Link href="#" className="text-gray-400 hover:text-purple-300 transition-colors duration-300 text-sm">
                 Privacy

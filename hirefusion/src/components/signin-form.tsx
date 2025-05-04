@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { getSession, signIn } from "next-auth/react"
 import {
   AlertCircle,
   Loader2,
@@ -85,7 +85,7 @@ export default function SigninForm() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    
     // Mark all fields as touched
     setTouched({
       email: true,
@@ -109,6 +109,46 @@ export default function SigninForm() {
         setLoading(false)
       } else if (res?.ok) {
         setShowSuccess(true)
+        const session = await getSession()
+        try {
+              if (!session?.user?.email) {
+                throw new Error("User not authenticated")
+              }
+        
+              const response = await fetch(`/api/recommendations/getjobs?email=${encodeURIComponent(session.user.email)}`)
+        
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+              }
+        
+              const data = await response.json()
+              
+              // const jobRecommendations = data.jobs.length
+              
+              try {
+                const response = await fetch("/api/notifications/addNotification", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    email: session.user.email,
+                    message: `${data.length} job recommendations are found.`,
+                    type: "info",
+                  }),
+                })
+                
+                if (response.ok) {
+                  // Handle success (e.g., show a success message or refetch notifications)
+                } else {
+                  console.error("Failed to add notification")
+                }
+              } catch (error) {
+                console.error("Error adding notification:", error)
+              }
+            } catch (error) {
+              console.error("Error fetching job recommendations:", error)
+            }
         setTimeout(() => {
           const destination = searchParams.get("redirect") || "/home"
           router.push(destination)

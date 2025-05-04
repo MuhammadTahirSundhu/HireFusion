@@ -83,6 +83,21 @@ export function JobCard({ job, isSelected, initialIsSaved = false, onClick, onSa
         if (onSave) {
           onSave(uniqueId, !isSaved)
         }
+        try {
+          const response = await fetch("/api/notifications/addNotification", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({email:session.user.email, message:"Job Saved successfully",type: "success" }),
+          })
+          if (response.ok) {
+          } else {
+            console.error("Failed to add notification")
+          }
+        } catch (error) {
+          console.error("Error adding notification:", error)
+        }
       } else {
         console.error("Failed to save/unsave job:", data.message)
         alert(data.message || "Failed to update job")

@@ -94,6 +94,21 @@ export interface Job extends Document {
   job_link: string;
 }
 
+export interface INotification extends Document {
+  message: string
+  type: "info" | "warning" | "success"
+  createdAt: Date
+  userEmail: string
+}
+
+const NotificationSchema: Schema = new Schema({
+  message: { type: String, required: true },
+  type: { type: String, enum: ["info", "warning", "success"], required: true },
+  createdAt: { type: Date, default: Date.now },
+  userEmail: { type: String, required: true, index: true },
+})
+
+
 const JobSchema: Schema<Job> = new Schema(
   {
     job_title: { type: String, required: true, trim: true },
@@ -175,10 +190,14 @@ const JobRecommendationModel =
   (mongoose.models.JobRecommendation as mongoose.Model<JobRecommendation>) ||
   mongoose.model<JobRecommendation>("JobRecommendation", JobRecommendationSchema);
 
+const NotificationModel = mongoose.models.Notification ||
+ mongoose.model<INotification>("Notification", NotificationSchema)
+
 export {
   UserModel,
   JobScraperModel,
   JobModel,
   JobApplicationModel,
   JobRecommendationModel,
+  NotificationModel
 };

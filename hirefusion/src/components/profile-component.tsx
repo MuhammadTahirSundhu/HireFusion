@@ -250,6 +250,21 @@ export default function ProfileComponent() {
       setProfile(updatedProfile)
       setEditedProfile(updatedProfile)
       setIsEditing(false)
+      try {
+        const response = await fetch("/api/notifications/addNotification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({email:session.user.email, message:"Profile updated successfully",type: "success" }),
+        })
+        if (response.ok) {
+        } else {
+          console.error("Failed to add notification")
+        }
+      } catch (error) {
+        console.error("Error adding notification:", error)
+      }
       setToast({
         visible: true,
         message: "Profile updated successfully",

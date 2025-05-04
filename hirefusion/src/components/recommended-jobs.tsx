@@ -49,7 +49,6 @@ export default function RecommendedJobs() {
       }
 
       const data = await response.json()
-      console.log("Recommended jobs data:", data)
 
       // Handle the API response format
       const jobs: Job[] = data.jobs || data || [] // Handle different possible response formats
