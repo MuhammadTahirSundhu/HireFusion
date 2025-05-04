@@ -558,10 +558,6 @@ export default function JobsPage() {
 
         {activeTab === "recommended" && (
           <RecommendedJobs
-            jobOptions={jobOptions}
-            locationOptions={locationOptions}
-            savedJobs={savedJobs}
-            toggleSaveJob={toggleSaveJob}
           />
         )}
 
@@ -691,9 +687,6 @@ export default function JobsPage() {
         {activeTab === "alerts" && (
           <JobAlerts
             jobOptions={jobOptions}
-            locationOptions={locationOptions}
-            jobTypeOptions={jobTypeOptions}
-            experienceLevelOptions={experienceLevelOptions}
           />
         )}
       </div>

@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, X } from "lucide-react"
 
 export interface FilterOptions {
   jobTypes: string[]
@@ -20,21 +20,16 @@ interface AdvancedFiltersProps {
   resetFilters: () => void
 }
 
-export function AdvancedFilters({
-  filterOptions,
-  setFilterOptions,
-  applyFilters,
-  resetFilters,
-}: AdvancedFiltersProps) {
+export function AdvancedFilters({ filterOptions, setFilterOptions, applyFilters, resetFilters }: AdvancedFiltersProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "job-type": true,
-    "experience": true,
-    "salary": true,
-    "skills": false,
-    "companies": false,
-    "industries": false,
-    "remote": false,
-    "date-posted": false
+    experience: true,
+    salary: true,
+    skills: false,
+    companies: false,
+    industries: false,
+    remote: false,
+    "date-posted": false,
   })
 
   const jobTypeOptions = ["Full-time", "Part-time", "Contract", "Temporary", "Internship", "Freelance"]
@@ -65,7 +60,7 @@ export function AdvancedFilters({
     "Airbnb",
     "Uber",
     "Twitter",
-    "Salesforce"
+    "Salesforce",
   ]
 
   const industryOptions = [
@@ -174,9 +169,9 @@ export function AdvancedFilters({
   }
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }))
   }
 
@@ -195,16 +190,16 @@ export function AdvancedFilters({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Advanced Filters</h2>
-        <p className="text-gray-500 mb-6">Refine your job search with detailed filters</p>
-        
+      <div className="bg-black/90 backdrop-blur-md rounded-xl shadow-lg shadow-purple-900/20 p-6 border border-purple-900/30">
+        <h2 className="text-2xl font-bold text-white mb-4">Advanced Filters</h2>
+        <p className="text-gray-400 mb-6">Refine your job search with detailed filters</p>
+
         {getActiveFilterCount() > 0 && (
-          <div className="mb-6 p-4 border-b bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-gray-900/50 rounded-lg border border-purple-800/30">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">Active Filters</h3>
-              <button 
-                className="text-sm text-gray-600 hover:text-gray-900"
+              <h3 className="font-medium text-purple-300">Active Filters</h3>
+              <button
+                className="text-sm text-purple-400 hover:text-purple-300 transition-colors duration-200"
                 onClick={resetFilters}
               >
                 Clear All
@@ -212,10 +207,13 @@ export function AdvancedFilters({
             </div>
             <div className="flex flex-wrap gap-2">
               {filterOptions.jobTypes.map((type) => (
-                <span key={type} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={type}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {type}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleJobTypeToggle(type)}
                   >
                     <X className="h-3 w-3" />
@@ -223,10 +221,13 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.experienceLevels.map((level) => (
-                <span key={level} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={level}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {level}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleExperienceLevelToggle(level)}
                   >
                     <X className="h-3 w-3" />
@@ -234,10 +235,13 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.skills.map((skill) => (
-                <span key={skill} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={skill}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {skill}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleSkillToggle(skill)}
                   >
                     <X className="h-3 w-3" />
@@ -245,10 +249,13 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.companies.map((company) => (
-                <span key={company} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={company}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {company}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleCompanyToggle(company)}
                   >
                     <X className="h-3 w-3" />
@@ -256,10 +263,13 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.industries.map((industry) => (
-                <span key={industry} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={industry}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {industry}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleIndustryToggle(industry)}
                   >
                     <X className="h-3 w-3" />
@@ -267,10 +277,13 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.remoteOptions.map((option) => (
-                <span key={option} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span
+                  key={option}
+                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50"
+                >
                   {option}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleRemoteToggle(option)}
                   >
                     <X className="h-3 w-3" />
@@ -278,10 +291,10 @@ export function AdvancedFilters({
                 </span>
               ))}
               {filterOptions.datePosted && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50">
                   {datePostedOptions.find((o) => o.value === filterOptions.datePosted)?.label}
-                  <button 
-                    className="ml-1 text-gray-500 hover:text-gray-700"
+                  <button
+                    className="ml-1 text-purple-400 hover:text-purple-200 transition-colors duration-200"
                     onClick={() => handleDatePostedChange(null)}
                   >
                     <X className="h-3 w-3" />
@@ -289,7 +302,7 @@ export function AdvancedFilters({
                 </span>
               )}
               {(filterOptions.salaryRange[0] > 0 || filterOptions.salaryRange[1] < 250000) && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-900/50 text-purple-200 border border-purple-700/50">
                   {formatSalary(filterOptions.salaryRange[0])} - {formatSalary(filterOptions.salaryRange[1])}
                 </span>
               )}
@@ -299,30 +312,32 @@ export function AdvancedFilters({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Job Type Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("job-type")}
             >
-              Job Type
+              <span className="text-white">Job Type</span>
               {expandedSections["job-type"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["job-type"] && (
               <div className="p-3">
                 <div className="grid grid-cols-1 gap-2">
                   {jobTypeOptions.map((type) => (
-                    <label key={type} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={type} className="flex items-center space-x-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={filterOptions.jobTypes.includes(type)}
                         onChange={() => handleJobTypeToggle(type)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="h-4 w-4 text-purple-600 border-gray-700 rounded focus:ring-purple-500 bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700">{type}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-purple-300 transition-colors duration-200">
+                        {type}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -331,30 +346,32 @@ export function AdvancedFilters({
           </div>
 
           {/* Experience Level Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("experience")}
             >
-              Experience Level
+              <span className="text-white">Experience Level</span>
               {expandedSections["experience"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["experience"] && (
               <div className="p-3">
                 <div className="grid grid-cols-1 gap-2">
                   {experienceLevelOptions.map((level) => (
-                    <label key={level} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={level} className="flex items-center space-x-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={filterOptions.experienceLevels.includes(level)}
                         onChange={() => handleExperienceLevelToggle(level)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="h-4 w-4 text-purple-600 border-gray-700 rounded focus:ring-purple-500 bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700">{level}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-purple-300 transition-colors duration-200">
+                        {level}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -363,23 +380,23 @@ export function AdvancedFilters({
           </div>
 
           {/* Salary Range Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("salary")}
             >
-              Salary Range
+              <span className="text-white">Salary Range</span>
               {expandedSections["salary"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["salary"] && (
               <div className="p-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Minimum</label>
+                    <label className="block text-xs text-gray-400 mb-1">Minimum</label>
                     <input
                       type="number"
                       value={filterOptions.salaryRange[0]}
@@ -387,11 +404,11 @@ export function AdvancedFilters({
                       min="0"
                       max="250000"
                       step="5000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                      className="w-full px-3 py-2 border border-purple-800/50 rounded-md text-sm bg-gray-800 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Maximum</label>
+                    <label className="block text-xs text-gray-400 mb-1">Maximum</label>
                     <input
                       type="number"
                       value={filterOptions.salaryRange[1]}
@@ -399,11 +416,11 @@ export function AdvancedFilters({
                       min="0"
                       max="250000"
                       step="5000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                      className="w-full px-3 py-2 border border-purple-800/50 rounded-md text-sm bg-gray-800 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
                     />
                   </div>
                 </div>
-                <div className="flex justify-between text-sm text-gray-500 mt-2">
+                <div className="flex justify-between text-sm text-gray-400 mt-2">
                   <span>{formatSalary(filterOptions.salaryRange[0])}</span>
                   <span>{formatSalary(filterOptions.salaryRange[1])}</span>
                 </div>
@@ -412,30 +429,32 @@ export function AdvancedFilters({
           </div>
 
           {/* Skills Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("skills")}
             >
-              Skills
+              <span className="text-white">Skills</span>
               {expandedSections["skills"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["skills"] && (
               <div className="p-3">
                 <div className="grid grid-cols-1 gap-2">
                   {skillOptions.map((skill) => (
-                    <label key={skill} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={skill} className="flex items-center space-x-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={filterOptions.skills.includes(skill)}
                         onChange={() => handleSkillToggle(skill)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="h-4 w-4 text-purple-600 border-gray-700 rounded focus:ring-purple-500 bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700">{skill}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-purple-300 transition-colors duration-200">
+                        {skill}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -444,30 +463,32 @@ export function AdvancedFilters({
           </div>
 
           {/* Companies Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("companies")}
             >
-              Companies
+              <span className="text-white">Companies</span>
               {expandedSections["companies"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["companies"] && (
               <div className="p-3">
                 <div className="grid grid-cols-1 gap-2">
                   {companyOptions.map((company) => (
-                    <label key={company} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={company} className="flex items-center space-x-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={filterOptions.companies.includes(company)}
                         onChange={() => handleCompanyToggle(company)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="h-4 w-4 text-purple-600 border-gray-700 rounded focus:ring-purple-500 bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700">{company}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-purple-300 transition-colors duration-200">
+                        {company}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -476,30 +497,32 @@ export function AdvancedFilters({
           </div>
 
           {/* Remote Options Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("remote")}
             >
-              Remote Options
+              <span className="text-white">Remote Options</span>
               {expandedSections["remote"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["remote"] && (
               <div className="p-3">
                 <div className="grid grid-cols-1 gap-2">
                   {remoteOptions.map((option) => (
-                    <label key={option} className="flex items-center space-x-2 cursor-pointer">
+                    <label key={option} className="flex items-center space-x-2 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={filterOptions.remoteOptions.includes(option)}
                         onChange={() => handleRemoteToggle(option)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="h-4 w-4 text-purple-600 border-gray-700 rounded focus:ring-purple-500 bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700">{option}</span>
+                      <span className="text-sm text-gray-300 group-hover:text-purple-300 transition-colors duration-200">
+                        {option}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -508,16 +531,16 @@ export function AdvancedFilters({
           </div>
 
           {/* Date Posted Section */}
-          <div className="border rounded-md overflow-hidden">
+          <div className="border border-purple-800/30 rounded-md overflow-hidden bg-gray-900/30 backdrop-blur-sm transition-all duration-300 hover:border-purple-700/50">
             <button
-              className="w-full p-3 text-left font-medium flex justify-between items-center bg-gray-50 border-b"
+              className="w-full p-3 text-left font-medium flex justify-between items-center bg-purple-900/20 border-b border-purple-800/30"
               onClick={() => toggleSection("date-posted")}
             >
-              Date Posted
+              <span className="text-white">Date Posted</span>
               {expandedSections["date-posted"] ? (
-                <ChevronUp className="h-4 w-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-purple-400" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-purple-400" />
               )}
             </button>
             {expandedSections["date-posted"] && (
@@ -526,10 +549,10 @@ export function AdvancedFilters({
                   {datePostedOptions.map((option) => (
                     <button
                       key={option.label}
-                      className={`px-3 py-1.5 text-sm border rounded-md ${
+                      className={`px-3 py-1.5 text-sm border rounded-md transition-all duration-200 ${
                         filterOptions.datePosted === option.value
-                          ? "bg-blue-50 border-blue-200 text-blue-700"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                          ? "bg-purple-900/70 border-purple-700 text-purple-100"
+                          : "border-gray-700 text-gray-300 hover:bg-purple-900/30 hover:border-purple-700/50"
                       }`}
                       onClick={() => handleDatePostedChange(option.value)}
                     >
@@ -544,13 +567,13 @@ export function AdvancedFilters({
 
         <div className="mt-6 flex justify-end gap-2">
           <button
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-purple-800/50 rounded-md text-sm font-medium text-gray-300 hover:bg-purple-900/30 hover:text-white transition-all duration-200"
             onClick={resetFilters}
           >
             Reset Filters
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700"
+            className="px-4 py-2 bg-gradient-to-r from-purple-700 to-purple-500 border border-transparent rounded-md text-sm font-medium text-white hover:from-purple-600 hover:to-purple-400 transition-all duration-200 shadow-lg shadow-purple-900/30"
             onClick={applyFilters}
           >
             Apply Filters
