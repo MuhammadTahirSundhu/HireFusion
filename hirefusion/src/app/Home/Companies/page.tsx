@@ -1,7 +1,6 @@
- "use client"
+"use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import CompanyGrid from "@/components/company-grid"
@@ -19,7 +18,6 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { url } from "inspector"
 
 export default function CompaniesPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -42,7 +40,6 @@ export default function CompaniesPage() {
       location: "Lahore, Pakistan",
       rating: 4.7,
       comp_url: "https://www.systemsltd.com",
-  
     },
     {
       id: 2,
@@ -53,8 +50,7 @@ export default function CompaniesPage() {
       industry: "Finance",
       location: "Karachi, Pakistan",
       rating: 4.5,
-      comp_url: "https://www.systemsltd.com",
-
+      comp_url: "https://www.hbl.com",
     },
     {
       id: 3,
@@ -65,8 +61,7 @@ export default function CompaniesPage() {
       industry: "Telecommunications",
       location: "Islamabad, Pakistan",
       rating: 4.6,
-      comp_url: "https://www.systemsltd.com",
-
+      comp_url: "https://www.jazz.com.pk",
     },
   ]
 
@@ -98,24 +93,19 @@ export default function CompaniesPage() {
     const container = containerRef.current
     if (!container) return
 
-    // Handle mouse movement
     const handleMouseMove = (e: MouseEvent) => {
-      if (isTouching) return // Skip if currently touching (prevents conflicts)
-
+      if (isTouching) return
       const rect = container.getBoundingClientRect()
-      // Calculate mouse position relative to the container (0-100)
       const x = ((e.clientX - rect.left) / rect.width) * 100
       const y = ((e.clientY - rect.top) / rect.height) * 100
       setPointerPosition({ x, y })
     }
 
-    // Handle touch events
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 0) {
         setIsTouching(true)
         const touch = e.touches[0]
         const rect = container.getBoundingClientRect()
-        // Calculate touch position relative to the container (0-100)
         const x = ((touch.clientX - rect.left) / rect.width) * 100
         const y = ((touch.clientY - rect.top) / rect.height) * 100
         setPointerPosition({ x, y })
@@ -124,21 +114,19 @@ export default function CompaniesPage() {
 
     const handleTouchStart = (e: TouchEvent) => {
       setIsTouching(true)
-      handleTouchMove(e) // Process the initial touch position
+      handleTouchMove(e)
     }
 
     const handleTouchEnd = () => {
       setIsTouching(false)
     }
 
-    // Add event listeners
     window.addEventListener("mousemove", handleMouseMove)
     container.addEventListener("touchstart", handleTouchStart, { passive: true })
     container.addEventListener("touchmove", handleTouchMove, { passive: true })
     container.addEventListener("touchend", handleTouchEnd)
     container.addEventListener("touchcancel", handleTouchEnd)
 
-    // Clean up
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
       container.removeEventListener("touchstart", handleTouchStart)
@@ -148,7 +136,6 @@ export default function CompaniesPage() {
     }
   }, [isTouching])
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -185,7 +172,7 @@ export default function CompaniesPage() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-purple-900 dark:to-gray-900 relative overflow-hidden"
+      className="min-h-screen bg-black relative overflow-hidden"
       style={
         {
           "--mouse-x": `${pointerPosition.x}%`,
@@ -195,66 +182,39 @@ export default function CompaniesPage() {
       }
     >
       {/* Scroll progress indicator */}
-      <div className="fixed top-0 left-0 h-1 bg-purple-600 z-50" style={{ width: `${scrollProgress}%` }}></div>
-
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Animated gradient blobs */}
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-purple-300 rounded-full filter blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-purple-400 rounded-full filter blur-3xl opacity-20 translate-y-1/3 -translate-x-1/3 animate-blob animation-delay-4000"></div>
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-purple-500 rounded-full filter blur-3xl opacity-10 animate-blob"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600 rounded-full filter blur-3xl opacity-10 animate-blob animation-delay-3000"></div>
-
-        {/* Animated lines */}
-        <div className="animated-lines">
-          <div className="line line-1 mouse-reactive"></div>
-          <div className="line line-2 mouse-reactive"></div>
-          <div className="line line-3 mouse-reactive"></div>
-          <div className="line line-4 mouse-reactive"></div>
-          <div className="line line-5 mouse-reactive"></div>
-          <div className="line line-6 mouse-reactive"></div>
-          <div className="diagonal-line diagonal-line-1 mouse-reactive"></div>
-          <div className="diagonal-line diagonal-line-2 mouse-reactive"></div>
-          <div className={`pointer-follower ${isTouching ? "touch-active" : ""}`}></div>
-        </div>
-
-        {/* Floating elements */}
-        <div className="absolute top-1/4 left-1/5 w-20 h-20 bg-purple-200 rounded-full opacity-30 animate-float-slow"></div>
-        <div className="absolute top-3/4 left-2/3 w-16 h-16 bg-purple-300 rounded-full opacity-30 animate-float-medium"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-purple-400 rounded-full opacity-20 animate-float-fast"></div>
-        <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-purple-300 rounded-full opacity-20 animate-float-medium"></div>
-      </div>
+      <div className="fixed top-0 left-0 h-0.5 bg-purple-600 z-50" style={{ width: `${scrollProgress}%` }}></div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 py-16 relative z-10">
-        <motion.div className="text-center mb-16" initial="hidden" animate="visible" variants={headerVariants}>
-          <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-purple-500 mb-6">
-            Explore Companies
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <motion.div className="text-center mb-12" initial="hidden" animate="visible" variants={headerVariants}>
+          <h1 className="text-3xl md:text-4xl font-semibold text-purple-100 mb-4">
+            Explore Top Companies
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-            Discover top companies hiring in Pakistan. Explore company profiles, read reviews, and find your dream job
-            at leading organizations.
+          <p className="text-base text-purple-200 max-w-xl mx-auto mb-8">
+            Connect with leading organizations hiring in Pakistan.
           </p>
 
           {/* Search bar */}
-          <div className="relative max-w-2xl mx-auto mb-12 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-gradient-x"></div>
-            <div className="relative flex items-center bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-              <Search className="h-5 w-5 text-gray-400 ml-4" />
+          <div className="relative max-w-lg mx-auto mb-8 group">
+            <div className="absolute inset-0 bg-purple-600 rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-300"></div>
+            <div className="relative flex items-center bg-gray-900 rounded-lg shadow-md border border-purple-700">
+              <Search className="h-5 w-5 text-purple-400 ml-4" />
               <input
                 type="text"
                 placeholder="Search companies..."
-                className="w-full py-4 px-4 bg-transparent text-gray-700 dark:text-gray-200 focus:outline-none"
+                className="w-full py-3 px-4 bg-transparent text-purple-100 text-sm focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 mr-2 rounded-md transition-all"
+                <motion.button
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 mr-2 rounded-md text-sm transition-all"
                   onClick={() => setSearchQuery("")}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Clear
-                </button>
+                </motion.button>
               )}
             </div>
           </div>
@@ -264,10 +224,10 @@ export default function CompaniesPage() {
             {industryFilters.map((filter) => (
               <motion.button
                 key={filter.id}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${
+                className={`flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm transition-all ${
                   activeFilter === filter.id
-                    ? "bg-purple-600 text-white shadow-lg"
-                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-purple-100 dark:hover:bg-purple-900"
+                    ? "bg-purple-600 text-white shadow-md"
+                    : "bg-gray-900 text-purple-300 border border-purple-700 hover:bg-purple-800"
                 }`}
                 onClick={() => setActiveFilter(filter.id)}
                 whileHover={{ scale: 1.05 }}
@@ -282,19 +242,19 @@ export default function CompaniesPage() {
 
         {/* Featured Companies Section */}
         <motion.div
-          className="mb-16"
-          initial={{ opacity: 0, y: 30 }}
+          className="mb-12"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Featured Companies</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-purple-100">Featured Companies</h2>
             <Link
               href="/companies/featured"
-              className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 flex items-center group"
+              className="text-purple-400 hover:text-purple-300 flex items-center group text-sm"
             >
-              <span>View all</span>
-              <ChevronRight className="h-5 w-5 ml-1 group-hover:translate-x-1 transition-transform" />
+              <span>View All</span>
+              <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -302,40 +262,37 @@ export default function CompaniesPage() {
             {featuredCompanies.map((company) => (
               <motion.div
                 key={company.id}
-                className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 group"
-                whileHover={{ y: -8 }}
+                className="relative bg-gray-900 rounded-lg shadow-md border border-purple-700 group"
+                whileHover={{ y: -4, boxShadow: "0 0 10px rgba(139, 92, 246, 0.2)" }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * company.id }}
               >
-                {/* Company header with gradient */}
-                <div className="h-24 bg-white relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-50 to-indigo-50"></div>
-                  <div className="absolute top-1/2 left-6 transform -translate-y-1/2 w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl shadow-lg border-4 border-white">
-                    {company.logo}
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-12 h-12 bg-gray-800 rounded-md flex items-center justify-center text-2xl border border-purple-600">
+                      {company.logo}
+                    </div>
+                    <div className="bg-purple-900 rounded-full px-2 py-1 flex items-center text-xs">
+                      <Star className="h-3 w-3 text-yellow-400 mr-1" fill="#facc15" />
+                      <span className="text-yellow-400">{company.rating}</span>
+                    </div>
                   </div>
-                  <div className="absolute top-2 right-2 bg-yellow-50 rounded-full px-2 py-1 text-xs flex items-center shadow-md">
-                    <Star className="h-3 w-3 text-yellow-500 mr-1" fill="#eab308" />
-                    <span className="text-yellow-700">{company.rating}</span>
-                  </div>
-                </div>
 
-                {/* Company content */}
-                <div className="p-6 pt-10">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{company.name}</h3>
-                  <p className="text-gray-600 text-sm mb-4">{company.description}</p>
+                  <h3 className="text-lg font-semibold text-purple-100 mb-2">{company.name}</h3>
+                  <p className="text-purple-300 text-sm mb-3 line-clamp-2">{company.description}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <div className="flex items-center text-xs bg-blue-50 text-blue-800 px-2 py-1 rounded-full">
-                      <Building2 className="h-3 w-3 mr-1 text-blue-600" />
+                    <div className="flex items-center text-xs bg-purple-950 text-purple-200 px-2 py-1 rounded-md">
+                      <Building2 className="h-3 w-3 mr-1 text-purple-400" />
                       <span>{company.industry}</span>
                     </div>
-                    <div className="flex items-center text-xs bg-purple-50 text-purple-800 px-2 py-1 rounded-full">
-                      <MapPin className="h-3 w-3 mr-1 text-purple-600" />
+                    <div className="flex items-center text-xs bg-purple-950 text-purple-200 px-2 py-1 rounded-md">
+                      <MapPin className="h-3 w-3 mr-1 text-purple-400" />
                       <span>{company.location}</span>
                     </div>
-                    <div className="flex items-center text-xs bg-green-50 text-green-800 px-2 py-1 rounded-full">
-                      <Users className="h-3 w-3 mr-1 text-green-600" />
+                    <div className="flex items-center text-xs bg-purple-950 text-purple-200 px-2 py-1 rounded-md">
+                      <Users className="h-3 w-3 mr-1 text-purple-400" />
                       <span>{company.employees}</span>
                     </div>
                   </div>
@@ -344,16 +301,18 @@ export default function CompaniesPage() {
                     <Link
                       href={company.comp_url}
                       target="_blank"
-                      className="text-purple-600 hover:text-purple-800 text-sm font-medium flex items-center group"
+                      className="text-purple-400 hover:text-purple-300 text-sm flex items-center group"
                     >
-                      <span>Company Profile</span>
-                      <ArrowUpRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                      <span>Website</span>
+                      <ArrowUpRight className="h-4 w-4 ml-1 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </Link>
                     <Link
-                      href={`/companies/${company.id}/jobs`}
-                      className="bg-purple-600 hover:bg-purple-700 text-white text-sm px-3 py-1.5 rounded-md transition-colors"
+                      href={company.comp_url}
+                      target="_blank"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md text-sm flex items-center"
                     >
-                      View Jobs
+                      Explore
+                      <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
                   </div>
                 </div>
@@ -364,29 +323,28 @@ export default function CompaniesPage() {
 
         {/* Stats Section */}
         <motion.div
-          className="mb-16 bg-white rounded-xl p-8 shadow-lg border border-gray-100"
-          initial={{ opacity: 0, y: 30 }}
+          className="mb-12 bg-gray-900 rounded-lg p-6 shadow-md border border-purple-700"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Pakistan's Leading Job Platform</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-4xl font-bold text-purple-600 mb-2">500+</div>
-              <div className="text-gray-600">Companies</div>
-            </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-4xl font-bold text-blue-600 mb-2">10K+</div>
-              <div className="text-gray-600">Jobs Posted</div>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-4xl font-bold text-green-600 mb-2">50K+</div>
-              <div className="text-gray-600">Job Seekers</div>
-            </div>
-            <div className="text-center p-4 bg-amber-50 rounded-lg">
-              <div className="text-4xl font-bold text-amber-600 mb-2">25K+</div>
-              <div className="text-gray-600">Successful Hires</div>
-            </div>
+          <h2 className="text-xl font-semibold text-purple-100 mb-6 text-center">Pakistan's Leading Job Platform</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { value: "500+", label: "Companies", color: "purple-600" },
+              { value: "10K+", label: "Jobs Posted", color: "purple-500" },
+              { value: "50K+", label: "Job Seekers", color: "purple-400" },
+              { value: "25K+", label: "Successful Hires", color: "purple-300" },
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className={`text-center p-4 bg-gray-950 rounded-md border border-${stat.color}`}
+                whileHover={{ scale: 1.03 }}
+              >
+                <div className={`text-2xl font-semibold text-${stat.color} mb-1`}>{stat.value}</div>
+                <div className="text-purple-200 text-sm">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 
@@ -395,61 +353,54 @@ export default function CompaniesPage() {
           variants={containerVariants}
           initial="hidden"
           animate={isLoaded ? "visible" : "hidden"}
-          className="mb-16"
+          className="mb-12"
         >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">All Companies</h2>
-            <div className="flex items-center space-x-2">
-              <button className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                <Filter className="h-4 w-4" />
-                <span>Sort by</span>
-              </button>
-            </div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-purple-100">All Companies</h2>
+            <button className="flex items-center space-x-1 text-purple-300 hover:text-purple-400 text-sm">
+              <Filter className="h-4 w-4" />
+              <span>Sort by</span>
+            </button>
           </div>
 
           <CompanyGrid searchQuery={searchQuery} industryFilter={activeFilter} />
         </motion.div>
 
-        {/* Join as Employer CTA */}
-        <motion.div
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl overflow-hidden shadow-xl"
-          initial={{ opacity: 0, y: 50 }}
+  {/* Enhanced Join as Employer CTA */}
+  <motion.div
+          className="bg-gradient-to-r from-purple-900 to-gray-900 rounded-xl shadow-2xl border border-purple-700 overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
+          transition={{ delay: 0.7 }}
         >
           <div className="md:flex items-center">
-            <div className="p-8 md:w-2/3">
-              <div className="text-purple-200 text-sm font-semibold tracking-wider mb-2">FOR EMPLOYERS</div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Join HireFusion as an Employer</h3>
-              <p className="text-purple-100 mb-6">
-                Post jobs, find top talent, and build your employer brand with HireFusion. Connect with thousands of
-                qualified candidates today.
+            <div className="p-8 md:p-12 md:w-3/5">
+              <div className="text-purple-300 text-sm font-semibold tracking-wider mb-3">FOR EMPLOYERS</div>
+              <h3 className="text-2xl md:text-3xl font-bold text-purple-100 mb-4">
+                Elevate Your Hiring with HireFusion
+              </h3>
+              <p className="text-purple-200 text-base mb-6">
+                edilir
+                Post jobs, connect with top talent, and build your dream team with our cutting-edge platform.
               </p>
               <motion.button
-                className="bg-white text-purple-700 hover:bg-purple-50 px-6 py-3 rounded-lg font-medium flex items-center"
+                className="bg-purple-600 text-white hover:bg-purple-700 px-6 py-3 rounded-md text-base font-medium flex items-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get Started
+                Start Hiring Now
                 <ChevronRight className="h-5 w-5 ml-2" />
               </motion.button>
             </div>
-            <div className="md:w-1/3 relative h-64 md:h-auto overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent to-purple-600 z-10 md:hidden"></div>
+            <div className="md:w-2/5 relative h-64 md:h-auto">
               <Image
-                src="/placeholder.svg?height=300&width=400"
-                alt="Employer Services"
-                width={400}
-                height={300}
+                src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+                alt="Professional team"
+                width={800}
+                height={600}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  <div className="absolute animate-ping-slow opacity-70 w-32 h-32 rounded-full bg-white"></div>
-                  <div className="absolute animate-ping-slow animation-delay-1000 opacity-70 w-24 h-24 rounded-full bg-white top-4 left-4"></div>
-                  <div className="relative z-20 text-purple-700 font-bold text-xl">EMPLOYER</div>
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent to-purple-900/50"></div>
             </div>
           </div>
         </motion.div>
