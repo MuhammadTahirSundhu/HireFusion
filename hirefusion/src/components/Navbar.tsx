@@ -75,12 +75,12 @@ export default function Navbar() {
   }, [pathname])
 
   const navItems = [
-    { href: "/home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
-    { href: "/home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
-    { href: "/home/Savedjobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
-    { href: "/home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
-    { href: "/home/resources", label: "Resources", icon: <FaRegFileAlt className="text-lg" /> },
-    { href: "/home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
+    { href: "/Home", label: "Home", icon: <FaTachometerAlt className="text-lg" /> },
+    { href: "/Home/jobs", label: "Find Jobs", icon: <FaBriefcase className="text-lg" /> },
+    { href: "/Home/Savedjobs", label: "Saved Jobs", icon: <FaBookmark className="text-lg" /> },
+    { href: "/Home/Companies", label: "Companies", icon: <FaRegBuilding className="text-lg" /> },
+    { href: "/Home/resources", label: "Resources", icon: <FaRegFileAlt className="text-lg" /> },
+    { href: "/Home/Career", label: "Career Advice", icon: <FaRegLightbulb className="text-lg" /> },
   ]
 
   return (
@@ -89,7 +89,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo / Brand */}
           <div className="flex items-center">
-            <Link href="/home" className="flex items-center group">
+            <Link href="/Home" className="flex items-center group">
               <div className="relative h-9 w-9 mr-3">
                 <div className="absolute inset-0 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-200">
                   <span className="text-blue-700 dark:text-blue-400 font-extrabold text-xl">HF</span>
@@ -164,7 +164,7 @@ export default function Navbar() {
                     </p>
                   </div>
                   <Link
-                    href="/home/profile"
+                    href="/Home/profile"
                     onClick={() => setIsProfileOpen(false)}
                     className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
                   >
