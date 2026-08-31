@@ -21,7 +21,7 @@
     "jdom": "^3.2.5",
     "lucide-react": "^0.483.0",
     "mongoose": "^8.12.2",
-    "next": "^15.2.3",
+    "next": "^15.2.4",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
     "p-queue": "^8.1.0",
@@ -47,7 +47,7 @@
     "@types/react-dom": "^19.1.2",
     "@types/three": "^0.175.0",
     "eslint": "^9",
-    "eslint-config-next": "15.2.3",
+    "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
