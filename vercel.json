@@ -1,4 +1,4 @@
 {
-  "framework": "nextjs",
-  "rootDirectory": "hirefusion"
+  "buildCommand": "npm run build --prefix hirefusion",
+  "outputDirectory": "hirefusion/.next"
 }
