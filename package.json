@@ -1,0 +1,11 @@
+{
+  "name": "hirefusion-root",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix hirefusion",
+    "build": "npm run build --prefix hirefusion",
+    "start": "npm run start --prefix hirefusion",
+    "lint": "npm run lint --prefix hirefusion"
+  }
+}

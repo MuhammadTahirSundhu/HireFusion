@@ -4,6 +4,9 @@ import { JobModel } from '@/models/User'; // Ensure this path is correct
 import dbConnect from '@/lib/dbConnect';
 import PQueue from 'p-queue';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 interface JobDetails {
   job_title: string;
   company_name: string;
